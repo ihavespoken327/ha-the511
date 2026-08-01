@@ -1,11 +1,15 @@
 {
   "config": {
+    "abort": {
+      "no_providers_available": "No providers are available yet."
+    },
     "step": {
       "user": {
         "title": "The 511",
-        "description": "Add a The 511 data source.",
+        "description": "Choose a data provider for your region.",
         "data": {
-          "name": "Entry label"
+          "name": "Entry label",
+          "provider": "Provider"
         }
       }
     },

@@ -10,6 +10,9 @@ DOMAIN = "the511"
 NAME = "The 511"
 SUBTITLE = "Traffic Cameras & Road Conditions"
 
+# Config entry data keys.
+CONF_PROVIDER = "provider"
+
 # How often the coordinator polls the configured provider.
 SCAN_INTERVAL = timedelta(minutes=5)
 

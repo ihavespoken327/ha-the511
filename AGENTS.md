@@ -45,5 +45,5 @@ pytest
 
 ## Phase status
 
-Phase 1 (bootstrap) done. Next: **Phase 2 — provider framework**
-(`providers/base.py`, `providers/registry.py`).
+Phases 1–2 done (bootstrap, provider framework). Next: **Phase 3 — Wisconsin
+provider** (`providers/wisconsin.py`, registered in `providers/__init__.py`).

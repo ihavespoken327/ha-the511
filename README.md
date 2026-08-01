@@ -63,7 +63,7 @@ pytest
 | Phase | Scope | Status |
 |-------|-------|--------|
 | 1 | Bootstrap integration | ✅ |
-| 2 | Provider framework | |
+| 2 | Provider framework | ✅ |
 | 3 | Wisconsin provider | |
 | 4 | Camera entities | |
 | 5 | Incident entities | |
