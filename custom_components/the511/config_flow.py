@@ -34,7 +34,16 @@ class The511ConfigFlow(ConfigFlow, domain=DOMAIN):
 
         if user_input is not None:
             self._user_input = dict(user_input)
-            self._provider_class = get_provider_class(str(user_input[CONF_PROVIDER]))
+            provider_id = str(user_input[CONF_PROVIDER])
+            self._provider_class = get_provider_class(provider_id)
+            for existing in self._async_current_entries():
+                if existing.data.get(CONF_PROVIDER) == provider_id:
+                    return self.async_abort(
+                        reason="already_configured",
+                        description_placeholders={
+                            "provider": self._provider_class.name
+                        },
+                    )
             if self._provider_class.required_config_keys:
                 return await self.async_step_provider_config()
             return self._create_entry()

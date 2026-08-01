@@ -45,6 +45,7 @@ pytest
 
 ## Phase status
 
-Phases 1–8 done (bootstrap, provider framework, Wisconsin provider, camera,
-incidents, road conditions, weather stations, travel times). Next: **Phase 9 —
-map support**, then **Phase 10 — multi-provider support**.
+Phases 1–10 done (bootstrap, provider framework, Wisconsin provider, camera,
+incidents, road conditions, weather stations, travel times, map markers via
+`geo_location`, multi-provider support with duplicate-provider guard).
+Integration is feature-complete for the current roadmap.

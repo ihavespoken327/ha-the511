@@ -8,10 +8,9 @@ American 511 systems.
 Cameras & Road Conditions
 
 > [!WARNING]
-> Work in progress. Current milestone: **Phase 8 — travel times**. Cameras,
-> incidents, road conditions, weather stations, and travel times are exposed
-> as entities for the Wisconsin provider; map and multi-provider support are
-> still planned.
+> Work in progress. Cameras, incidents, road conditions, weather stations,
+> travel times, incident map markers, and multi-provider support are all
+> implemented for the Wisconsin provider.
 
 ## Architecture
 
@@ -71,8 +70,8 @@ pytest
 | 6 | Road condition sensors | ✅ |
 | 7 | Weather stations | ✅ |
 | 8 | Travel times | ✅ |
-| 9 | Map support | |
-| 10 | Multi-provider support | |
+| 9 | Map support (`geo_location` incident markers) | ✅ |
+| 10 | Multi-provider support | ✅ |
 
 ## License
 

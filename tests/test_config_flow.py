@@ -95,3 +95,56 @@ async def test_config_flow_unique_id(hass, fake_provider_class):
     )
 
     assert first["flow_id"] != second["flow_id"]
+
+
+async def test_duplicate_provider_aborts(hass, fake_provider_class):
+    """Configuring the same provider twice should abort."""
+    result = await hass.config_entries.flow.async_init(
+        DOMAIN, context={"source": config_entries.SOURCE_USER}
+    )
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {CONF_NAME: "Wisconsin", CONF_PROVIDER: "fake"},
+    )
+    assert result["type"] == "create_entry"
+
+    result = await hass.config_entries.flow.async_init(
+        DOMAIN, context={"source": config_entries.SOURCE_USER}
+    )
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {CONF_NAME: "Wisconsin again", CONF_PROVIDER: "fake"},
+    )
+
+    assert result["type"] == "abort"
+    assert result["reason"] == "already_configured"
+
+
+async def test_different_providers_create_two_entries(
+    hass, fake_provider_class, secret_provider_class
+):
+    """A second provider should be configurable alongside the first."""
+    result = await hass.config_entries.flow.async_init(
+        DOMAIN, context={"source": config_entries.SOURCE_USER}
+    )
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {CONF_NAME: "Wisconsin", CONF_PROVIDER: "fake"},
+    )
+    assert result["type"] == "create_entry"
+
+    result = await hass.config_entries.flow.async_init(
+        DOMAIN, context={"source": config_entries.SOURCE_USER}
+    )
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {CONF_NAME: "Secret 511", CONF_PROVIDER: "secret"},
+    )
+    assert result["type"] == "form"
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {CONF_API_KEY: "test-key"},
+    )
+
+    assert result["type"] == "create_entry"
+    assert len(hass.config_entries.async_entries(DOMAIN)) == 2

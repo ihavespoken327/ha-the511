@@ -1,6 +1,7 @@
 {
   "config": {
     "abort": {
+      "already_configured": "Provider {provider} is already configured.",
       "no_providers_available": "No providers are available yet.",
       "provider_not_selected": "No provider was selected."
     },
