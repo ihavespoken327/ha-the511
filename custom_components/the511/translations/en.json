@@ -1,0 +1,14 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "The 511",
+        "description": "Add a The 511 data source.",
+        "data": {
+          "name": "Entry label"
+        }
+      }
+    },
+    "error": {}
+  }
+}

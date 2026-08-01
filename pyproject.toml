@@ -1,0 +1,51 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ha-the511"
+version = "0.1.0"
+description = "Traffic cameras, road conditions, incidents and more from North American 511 systems."
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "MIT" }
+
+[project.optional-dependencies]
+dev = [
+  "black",
+  "mypy",
+  "pytest",
+  "pytest-aiohttp",
+  "pytest-asyncio",
+  "pytest-cov",
+  "pytest-homeassistant-custom-component",
+  "ruff",
+  "types-pyyaml",
+]
+
+[tool.setuptools.packages.find]
+include = ["custom_components*"]
+
+[tool.black]
+line-length = 88
+target-version = ["py314"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+
+[tool.ruff.lint]
+extend-select = ["I", "F", "E", "W", "B", "UP", "SIM", "C4"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["SLF001"]
+
+[tool.mypy]
+python_version = "3.14"
+strict = true
+ignore_missing_imports = true
+files = ["custom_components"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"

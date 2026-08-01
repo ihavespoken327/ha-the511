@@ -1,0 +1,20 @@
+# Byte-compiled / caches
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+
+# Tooling caches
+.ruff_cache/
+.mypy_cache/
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# Virtual environments
+.venv/
+venv/
+
+# OS
+.DS_Store
