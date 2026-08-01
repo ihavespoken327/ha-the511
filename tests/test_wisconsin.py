@@ -9,6 +9,7 @@ from custom_components.the511.providers import get_provider_class
 from custom_components.the511.providers.wisconsin import (
     CAMERAS_URL,
     EVENTS_URL,
+    TRAVEL_TIMES_URL,
     WINTER_ROADS_URL,
     WisconsinProvider,
 )
@@ -30,12 +31,13 @@ def test_wisconsin_provider_registered():
 
 
 def test_wisconsin_capabilities():
-    """Wisconsin supports cameras, incidents, and road conditions."""
+    """Wisconsin supports cameras, incidents, road conditions, and travel times."""
     provider = WisconsinProvider(session=None, config={CONF_API_KEY: API_KEY})
 
     assert provider.supports_cameras
     assert provider.supports_incidents
     assert provider.supports_road_conditions
+    assert provider.supports_travel_times
     assert not provider.supports_weather
 
 
@@ -46,10 +48,13 @@ async def test_update_fetches_all_supported_resources(hass, aioclient_mock):
     aioclient_mock.get(
         WINTER_ROADS_URL, params={"key": API_KEY, "format": "json"}, json=[]
     )
+    aioclient_mock.get(
+        TRAVEL_TIMES_URL, params={"key": API_KEY, "format": "json"}, json=[]
+    )
 
     await _provider(hass).async_update()
 
-    assert aioclient_mock.call_count == 3
+    assert aioclient_mock.call_count == 4
 
 
 async def test_cameras_use_first_enabled_view(hass, aioclient_mock):
@@ -181,3 +186,51 @@ async def test_road_conditions_parse(hass, aioclient_mock):
     condition = conditions[0]
     assert condition.road == "I-90"
     assert condition.surface == "Partially covered"
+
+
+async def test_travel_times_parse(hass, aioclient_mock):
+    """Travel time resources should be normalized into travel times."""
+    aioclient_mock.get(
+        TRAVEL_TIMES_URL,
+        json=[
+            {
+                "Id": "STOC-Milwaukee::2003",
+                "RoadwayName": "I-39/90",
+                "Description": "I-39/90 NB US 12/18 to Badger Interchange",
+                "Distance": 4.0,
+                "NormalTime": 4.0,
+                "CurrentTime": 5.5,
+                "Delay": 1.5,
+                "Region": "Dane",
+                "StartLatitude": 43.047454,
+                "StartLongitude": -89.275751,
+                "EndLatitude": 43.103811,
+                "EndLongitude": -89.282141,
+            }
+        ],
+    )
+
+    travel_times = await _provider(hass).async_get_travel_times()
+
+    assert len(travel_times) == 1
+    travel_time = travel_times[0]
+    assert travel_time.id == "STOC-Milwaukee::2003"
+    assert travel_time.name == "I-39/90 NB US 12/18 to Badger Interchange"
+    assert travel_time.road == "I-39/90"
+    assert travel_time.minutes == 5.5
+    assert travel_time.normal_minutes == 4.0
+    assert travel_time.delay == 1.5
+    assert travel_time.distance == 4.0
+    assert travel_time.region == "Dane"
+    assert travel_time.start_latitude == 43.047454
+
+
+async def test_travel_time_missing_fields_have_stable_fallbacks(hass, aioclient_mock):
+    """Missing travel time identity fields should fall back to Unknown."""
+    aioclient_mock.get(TRAVEL_TIMES_URL, json=[{}])
+
+    travel_times = await _provider(hass).async_get_travel_times()
+
+    assert travel_times[0].id == "Unknown"
+    assert travel_times[0].name == "Unknown"
+    assert travel_times[0].minutes is None

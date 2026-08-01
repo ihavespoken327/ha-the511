@@ -42,6 +42,7 @@ async def test_update_composes_supported_capabilities():
     assert data.incidents == []
     assert data.road_conditions == []
     assert data.weather_stations == []
+    assert data.travel_times == []
 
 
 async def test_unsupported_capabilities_return_empty_list():
@@ -51,6 +52,7 @@ async def test_unsupported_capabilities_return_empty_list():
     assert await provider.async_get_incidents() == []
     assert await provider.async_get_road_conditions() == []
     assert await provider.async_get_weather() == []
+    assert await provider.async_get_travel_times() == []
 
 
 def test_unknown_provider_raises():

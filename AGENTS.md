@@ -45,5 +45,6 @@ pytest
 
 ## Phase status
 
-Phases 1–2 done (bootstrap, provider framework). Next: **Phase 3 — Wisconsin
-provider** (`providers/wisconsin.py`, registered in `providers/__init__.py`).
+Phases 1–8 done (bootstrap, provider framework, Wisconsin provider, camera,
+incidents, road conditions, weather stations, travel times). Next: **Phase 9 —
+map support**, then **Phase 10 — multi-provider support**.

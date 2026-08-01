@@ -8,9 +8,10 @@ American 511 systems.
 Cameras & Road Conditions
 
 > [!WARNING]
-> Work in progress. Current milestone: **Phase 1 — bootstrap**. The
-> integration loads, can be configured from the UI, and unloads cleanly,
-> but exposes no entities yet.
+> Work in progress. Current milestone: **Phase 8 — travel times**. Cameras,
+> incidents, road conditions, weather stations, and travel times are exposed
+> as entities for the Wisconsin provider; map and multi-provider support are
+> still planned.
 
 ## Architecture
 
@@ -64,12 +65,12 @@ pytest
 |-------|-------|--------|
 | 1 | Bootstrap integration | ✅ |
 | 2 | Provider framework | ✅ |
-| 3 | Wisconsin provider | |
-| 4 | Camera entities | |
-| 5 | Incident entities | |
-| 6 | Road condition sensors | |
-| 7 | Weather stations | |
-| 8 | Travel times | |
+| 3 | Wisconsin provider | ✅ |
+| 4 | Camera entities | ✅ |
+| 5 | Incident entities | ✅ |
+| 6 | Road condition sensors | ✅ |
+| 7 | Weather stations | ✅ |
+| 8 | Travel times | ✅ |
 | 9 | Map support | |
 | 10 | Multi-provider support | |
 

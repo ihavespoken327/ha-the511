@@ -12,12 +12,13 @@ from typing import Any
 
 from homeassistant.const import CONF_API_KEY
 
-from ..models import CameraData, IncidentData, RoadConditionData
+from ..models import CameraData, IncidentData, RoadConditionData, TravelTimeData
 from .base import BaseProvider
 
 CAMERAS_URL = "https://511wi.gov/api/v2/get/cameras"
 EVENTS_URL = "https://511wi.gov/api/v2/get/event"
 WINTER_ROADS_URL = "https://511wi.gov/api/v3/get/winterroads"
+TRAVEL_TIMES_URL = "https://511wi.gov/api/v2/get/traveltimes"
 
 
 class WisconsinProvider(BaseProvider):
@@ -30,6 +31,7 @@ class WisconsinProvider(BaseProvider):
     supports_cameras = True
     supports_incidents = True
     supports_road_conditions = True
+    supports_travel_times = True
 
     required_config_keys = (CONF_API_KEY,)
     secret_config_keys = (CONF_API_KEY,)
@@ -53,6 +55,11 @@ class WisconsinProvider(BaseProvider):
         """Return normalized winter road condition data."""
         conditions = await self._get_json(WINTER_ROADS_URL)
         return [self._parse_road_condition(condition) for condition in conditions]
+
+    async def async_get_travel_times(self) -> list[TravelTimeData]:
+        """Return normalized travel time data."""
+        travel_times = await self._get_json(TRAVEL_TIMES_URL)
+        return [self._parse_travel_time(travel_time) for travel_time in travel_times]
 
     async def _get_json(self, url: str) -> Any:
         """Fetch ``url`` and return the decoded JSON payload."""
@@ -95,6 +102,23 @@ class WisconsinProvider(BaseProvider):
         return RoadConditionData(
             road=condition.get("RoadwayName") or "Unknown",
             surface=condition.get("Overall Status"),
+        )
+
+    def _parse_travel_time(self, travel_time: dict[str, Any]) -> TravelTimeData:
+        """Convert a 511WI travel time resource into TravelTimeData."""
+        return TravelTimeData(
+            id=str(travel_time.get("Id") or "Unknown"),
+            name=travel_time.get("Description") or travel_time.get("Id") or "Unknown",
+            road=travel_time.get("RoadwayName"),
+            minutes=_parse_float(travel_time.get("CurrentTime")),
+            normal_minutes=_parse_float(travel_time.get("NormalTime")),
+            delay=_parse_float(travel_time.get("Delay")),
+            distance=_parse_float(travel_time.get("Distance")),
+            region=travel_time.get("Region"),
+            start_latitude=_parse_float(travel_time.get("StartLatitude")),
+            start_longitude=_parse_float(travel_time.get("StartLongitude")),
+            end_latitude=_parse_float(travel_time.get("EndLatitude")),
+            end_longitude=_parse_float(travel_time.get("EndLongitude")),
         )
 
     @staticmethod

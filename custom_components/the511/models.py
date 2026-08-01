@@ -55,11 +55,30 @@ class WeatherStationData:
     """Readings from a weather station."""
 
     station_id: str
+    name: str | None = None
     temperature: float | None = None
     humidity: float | None = None
     dewpoint: float | None = None
     wind: str | None = None
     visibility: float | None = None
+
+
+@dataclass(slots=True)
+class TravelTimeData:
+    """Travel time for a route segment."""
+
+    id: str
+    name: str
+    road: str | None = None
+    minutes: float | None = None
+    normal_minutes: float | None = None
+    delay: float | None = None
+    distance: float | None = None
+    region: str | None = None
+    start_latitude: float | None = None
+    start_longitude: float | None = None
+    end_latitude: float | None = None
+    end_longitude: float | None = None
 
 
 @dataclass(slots=True)
@@ -70,3 +89,4 @@ class ProviderData:
     incidents: list[IncidentData] = field(default_factory=list)
     road_conditions: list[RoadConditionData] = field(default_factory=list)
     weather_stations: list[WeatherStationData] = field(default_factory=list)
+    travel_times: list[TravelTimeData] = field(default_factory=list)

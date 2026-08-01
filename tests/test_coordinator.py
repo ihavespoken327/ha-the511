@@ -26,4 +26,11 @@ async def test_coordinator_refresh_pulls_provider_data(hass, fake_provider_class
     assert coordinator.last_update_success
     assert isinstance(coordinator.data, ProviderData)
     assert [cam.id for cam in coordinator.data.cameras] == ["cam-1"]
-    assert coordinator.data.incidents == []
+    assert [incident.id for incident in coordinator.data.incidents] == ["inc-1"]
+    assert [condition.road for condition in coordinator.data.road_conditions] == [
+        "I-94"
+    ]
+    assert [station.station_id for station in coordinator.data.weather_stations] == [
+        "ws-1"
+    ]
+    assert [travel_time.id for travel_time in coordinator.data.travel_times] == ["tt-1"]

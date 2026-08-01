@@ -5,7 +5,13 @@ from __future__ import annotations
 import pytest
 from homeassistant.const import CONF_API_KEY
 
-from custom_components.the511.models import CameraData
+from custom_components.the511.models import (
+    CameraData,
+    IncidentData,
+    RoadConditionData,
+    TravelTimeData,
+    WeatherStationData,
+)
 from custom_components.the511.providers import PROVIDERS, BaseProvider
 
 
@@ -25,6 +31,9 @@ def fake_provider_class():
         region = "Fake Region"
         supports_cameras = True
         supports_incidents = True
+        supports_road_conditions = True
+        supports_weather = True
+        supports_travel_times = True
 
         async def async_get_cameras(self) -> list[CameraData]:
             return [
@@ -38,6 +47,61 @@ def fake_provider_class():
                     longitude=-89.0,
                     video_url="https://example.com/cam-1.m3u8",
                     status="Enabled",
+                )
+            ]
+
+        async def async_get_incidents(self) -> list[IncidentData]:
+            return [
+                IncidentData(
+                    id="inc-1",
+                    title="Test Incident",
+                    description="Left lane blocked",
+                    severity="Moderate",
+                    event_type="Crash",
+                    latitude=43.1,
+                    longitude=-89.1,
+                    road="I-94",
+                )
+            ]
+
+        async def async_get_road_conditions(self) -> list[RoadConditionData]:
+            return [
+                RoadConditionData(
+                    road="I-94",
+                    surface="Clear Roads",
+                    pavement_temperature=2.0,
+                    air_temperature=1.0,
+                    visibility=10.0,
+                    wind_speed=15.0,
+                    snow=False,
+                    ice=True,
+                )
+            ]
+
+        async def async_get_weather(self) -> list[WeatherStationData]:
+            return [
+                WeatherStationData(
+                    station_id="ws-1",
+                    name="Test Station",
+                    temperature=1.0,
+                    humidity=85.0,
+                    dewpoint=-1.0,
+                    wind="W 15 km/h",
+                    visibility=8.0,
+                )
+            ]
+
+        async def async_get_travel_times(self) -> list[TravelTimeData]:
+            return [
+                TravelTimeData(
+                    id="tt-1",
+                    name="I-39/90 NB US 12/18 to Badger Interchange",
+                    road="I-39/90",
+                    minutes=12.0,
+                    normal_minutes=10.0,
+                    delay=2.0,
+                    distance=4.0,
+                    region="Dane",
                 )
             ]
 

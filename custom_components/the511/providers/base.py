@@ -12,6 +12,7 @@ from ..models import (
     IncidentData,
     ProviderData,
     RoadConditionData,
+    TravelTimeData,
     WeatherStationData,
 )
 
@@ -80,6 +81,8 @@ class BaseProvider:
             data.road_conditions = await self.async_get_road_conditions()
         if self.supports_weather:
             data.weather_stations = await self.async_get_weather()
+        if self.supports_travel_times:
+            data.travel_times = await self.async_get_travel_times()
         return data
 
     async def async_get_cameras(self) -> list[CameraData]:
@@ -97,4 +100,8 @@ class BaseProvider:
 
     async def async_get_weather(self) -> list[WeatherStationData]:
         """Return weather station data. Override when ``supports_weather`` is True."""
+        return []
+
+    async def async_get_travel_times(self) -> list[TravelTimeData]:
+        """Return travel times. Override when ``supports_travel_times`` is True."""
         return []

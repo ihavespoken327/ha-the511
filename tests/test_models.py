@@ -7,6 +7,7 @@ from custom_components.the511.models import (
     IncidentData,
     ProviderData,
     RoadConditionData,
+    TravelTimeData,
     WeatherStationData,
 )
 
@@ -52,11 +53,24 @@ def test_weather_station_defaults():
     """Weather station optional fields default to None."""
     station = WeatherStationData(station_id="s1")
 
+    assert station.name is None
     assert station.temperature is None
     assert station.humidity is None
     assert station.dewpoint is None
     assert station.wind is None
     assert station.visibility is None
+
+
+def test_travel_time_data_defaults():
+    """Travel time optional fields default to None."""
+    travel_time = TravelTimeData(id="t1", name="Route")
+
+    assert travel_time.road is None
+    assert travel_time.minutes is None
+    assert travel_time.normal_minutes is None
+    assert travel_time.delay is None
+    assert travel_time.distance is None
+    assert travel_time.region is None
 
 
 def test_provider_data_defaults_to_empty_lists():
@@ -67,3 +81,4 @@ def test_provider_data_defaults_to_empty_lists():
     assert data.incidents == []
     assert data.road_conditions == []
     assert data.weather_stations == []
+    assert data.travel_times == []
