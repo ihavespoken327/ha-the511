@@ -17,4 +17,4 @@ CONF_PROVIDER = "provider"
 SCAN_INTERVAL = timedelta(minutes=5)
 
 # Platforms the integration forwards. Grows as entity phases land.
-PLATFORMS: list[Platform] = []
+PLATFORMS: list[Platform] = [Platform.CAMERA]

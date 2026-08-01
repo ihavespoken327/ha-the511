@@ -2094,6 +2094,11 @@ dev = [
     { name = "types-pyyaml" },
 ]
 
+[package.dev-dependencies]
+dev = [
+    { name = "pyturbojpeg" },
+]
+
 [package.metadata]
 requires-dist = [
     { name = "black", marker = "extra == 'dev'" },
@@ -2107,6 +2112,9 @@ requires-dist = [
     { name = "types-pyyaml", marker = "extra == 'dev'" },
 ]
 provides-extras = ["dev"]
+
+[package.metadata.requires-dev]
+dev = [{ name = "pyturbojpeg", specifier = ">=2.5.0" }]
 
 [[package]]
 name = "habluetooth"
@@ -4458,7 +4466,6 @@ resolution-markers = [
 ]
 dependencies = [
     { name = "pytest", version = "9.0.3", source = { registry = "https://pypi.org/simple" } },
-    { name = "typing-extensions", marker = "python_version < '0'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/43/7c/d36d04db312ecf4298932ef77e6e4a9e8ad017906e24e34f0b0c361a2473/pytest_asyncio-1.4.0.tar.gz", hash = "sha256:c6c0d2259945122819f171a32ecea2c349ead889ee28176caaf492143424be42", size = 58514, upload-time = "2026-05-26T09:56:04.083Z" }
 wheels = [
@@ -4959,6 +4966,18 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/52/a0/07907b6ff512674d9b201859f7d212298c44933633c946703a20c25e9d81/pytokens-0.4.1-cp314-cp314t-musllinux_1_2_x86_64.whl", hash = "sha256:967cf6e3fd4adf7de8fc73cd3043754ae79c36475c1c11d514fc72cf5490094a", size = 306698, upload-time = "2026-01-30T01:03:29.653Z" },
     { url = "https://files.pythonhosted.org/packages/39/2a/cbbf9250020a4a8dd53ba83a46c097b69e5eb49dd14e708f496f548c6612/pytokens-0.4.1-cp314-cp314t-win_amd64.whl", hash = "sha256:584c80c24b078eec1e227079d56dc22ff755e0ba8654d8383b2c549107528918", size = 116287, upload-time = "2026-01-30T01:03:30.912Z" },
     { url = "https://files.pythonhosted.org/packages/c6/78/397db326746f0a342855b81216ae1f0a32965deccfd7c830a2dbc66d2483/pytokens-0.4.1-py3-none-any.whl", hash = "sha256:26cef14744a8385f35d0e095dc8b3a7583f6c953c2e3d269c7f82484bf5ad2de", size = 13729, upload-time = "2026-01-30T01:03:45.029Z" },
+]
+
+[[package]]
+name = "pyturbojpeg"
+version = "2.5.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "numpy" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/55/fe/b525bca5e85688a283839126095d3e7e6d9bb5e7f23c68e57ad30f43af14/pyturbojpeg-2.5.0.tar.gz", hash = "sha256:572e74886110e0bd85f8a95a188f1cda94c4a5f0222ff38a22d7e12faeb9844b", size = 49265, upload-time = "2026-07-14T16:00:50.511Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/6c/e4/b19be937c95df9a02d6337178088b56fe77c2656eab46489344c7ac510e9/pyturbojpeg-2.5.0-py3-none-any.whl", hash = "sha256:2c10c2de86aa0e4fd9d08de187e46e975d108db35c25842d342393913cf54c36", size = 27455, upload-time = "2026-07-14T16:00:49.05Z" },
 ]
 
 [[package]]

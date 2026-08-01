@@ -32,6 +32,12 @@ def fake_provider_class():
                     id="cam-1",
                     name="Test Camera",
                     image_url="https://example.com/cam-1.jpg",
+                    road="I-94",
+                    direction="East",
+                    latitude=43.0,
+                    longitude=-89.0,
+                    video_url="https://example.com/cam-1.m3u8",
+                    status="Enabled",
                 )
             ]
 

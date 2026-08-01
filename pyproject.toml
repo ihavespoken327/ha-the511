@@ -49,3 +49,8 @@ files = ["custom_components"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 asyncio_mode = "auto"
+
+[dependency-groups]
+dev = [
+    "pyturbojpeg>=2.5.0",
+]

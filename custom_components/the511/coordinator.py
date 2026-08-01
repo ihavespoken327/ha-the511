@@ -24,6 +24,7 @@ class The511DataUpdateCoordinator(DataUpdateCoordinator[ProviderData]):
     """
 
     provider: BaseProvider
+    config_entry: ConfigEntry
 
     def __init__(
         self,

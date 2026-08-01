@@ -35,12 +35,12 @@ async def test_diagnostics_serializes_provider_data(hass, fake_provider_class):
             "id": "cam-1",
             "name": "Test Camera",
             "image_url": "https://example.com/cam-1.jpg",
-            "road": None,
-            "direction": None,
-            "latitude": None,
-            "longitude": None,
-            "video_url": None,
-            "status": None,
+            "road": "I-94",
+            "direction": "East",
+            "latitude": 43.0,
+            "longitude": -89.0,
+            "video_url": "https://example.com/cam-1.m3u8",
+            "status": "Enabled",
             "last_updated": None,
         }
     ]
