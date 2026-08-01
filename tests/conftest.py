@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import pytest
+from homeassistant.const import CONF_API_KEY
 
 from custom_components.the511.models import CameraData
 from custom_components.the511.providers import PROVIDERS, BaseProvider
@@ -37,3 +38,24 @@ def fake_provider_class():
     PROVIDERS[FakeProvider.provider_id] = FakeProvider
     yield FakeProvider
     PROVIDERS.pop(FakeProvider.provider_id, None)
+
+
+@pytest.fixture
+def secret_provider_class():
+    """Register a provider that requires an api key, unregistering afterwards."""
+
+    class SecretProvider(BaseProvider):
+        provider_id = "secret"
+        name = "Secret 511"
+        region = "Secret Region"
+        supports_cameras = True
+
+        required_config_keys = (CONF_API_KEY,)
+        secret_config_keys = (CONF_API_KEY,)
+
+        async def async_get_cameras(self) -> list[CameraData]:
+            return []
+
+    PROVIDERS[SecretProvider.provider_id] = SecretProvider
+    yield SecretProvider
+    PROVIDERS.pop(SecretProvider.provider_id, None)

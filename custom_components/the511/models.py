@@ -12,7 +12,7 @@ class CameraData:
 
     id: str
     name: str
-    image_url: str
+    image_url: str | None = None
     road: str | None = None
     direction: str | None = None
     latitude: float | None = None

@@ -28,7 +28,7 @@ include = ["custom_components*"]
 
 [tool.black]
 line-length = 88
-target-version = ["py314"]
+target-version = ["py312"]
 
 [tool.ruff]
 line-length = 88

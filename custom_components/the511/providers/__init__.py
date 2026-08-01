@@ -12,6 +12,9 @@ from .registry import (
     get_provider_classes,
     get_provider_ids,
 )
+from .wisconsin import WisconsinProvider
+
+PROVIDERS[WisconsinProvider.provider_id] = WisconsinProvider
 
 __all__ = [
     "PROVIDERS",

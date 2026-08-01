@@ -55,4 +55,4 @@ def _create_provider(hass: HomeAssistant, entry: ConfigEntry) -> BaseProvider | 
             entry.title,
         )
         return None
-    return provider_class(async_get_clientsession(hass))
+    return provider_class(async_get_clientsession(hass), entry.data)

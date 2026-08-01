@@ -18,7 +18,7 @@ async def test_coordinator_refresh_pulls_provider_data(hass, fake_provider_class
         title=NAME,
         data={CONF_NAME: NAME, CONF_PROVIDER: "fake"},
     )
-    provider = fake_provider_class(session=async_get_clientsession(hass))
+    provider = fake_provider_class(session=async_get_clientsession(hass), config={})
     coordinator = The511DataUpdateCoordinator(hass, entry, provider)
 
     await coordinator.async_refresh()

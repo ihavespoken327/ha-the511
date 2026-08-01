@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import asdict, is_dataclass
 from datetime import datetime
 from typing import Any
@@ -9,7 +10,8 @@ from typing import Any
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 
-from .const import DOMAIN
+from .const import CONF_PROVIDER, DOMAIN
+from .providers import UnknownProviderError, get_provider_class
 
 
 async def async_get_config_entry_diagnostics(
@@ -18,15 +20,33 @@ async def async_get_config_entry_diagnostics(
     """Return diagnostics for a config entry."""
     coordinator = hass.data[DOMAIN][entry.entry_id]
 
-    # Phase 3+: redact provider credentials (api keys, tokens) from
-    # entry.data and provider data before returning.
     return {
         "title": entry.title,
-        "data": entry.data,
+        "data": _redact(entry.data, _secret_config_keys(entry)),
         "coordinator": {
             "last_update_success": coordinator.last_update_success,
             "data": _json_safe(coordinator.data),
         },
+    }
+
+
+def _secret_config_keys(entry: ConfigEntry) -> set[str]:
+    """Return the configured provider's secret config entry keys."""
+    provider_id = entry.data.get(CONF_PROVIDER)
+    if not isinstance(provider_id, str):
+        return set()
+    try:
+        provider_class = get_provider_class(provider_id)
+    except UnknownProviderError:
+        return set()
+    return set(provider_class.secret_config_keys)
+
+
+def _redact(data: Mapping[str, Any], secret_keys: set[str]) -> dict[str, Any]:
+    """Return a copy of ``data`` with values for secret keys replaced."""
+    return {
+        key: "[REDACTED]" if key in secret_keys else _json_safe(value)
+        for key, value in data.items()
     }
 
 

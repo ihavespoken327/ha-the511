@@ -33,7 +33,7 @@ class CamerasOnlyProvider(BaseProvider):
 
 async def test_update_composes_supported_capabilities():
     """async_update should fetch only supported capabilities."""
-    provider = CamerasOnlyProvider(session=None)
+    provider = CamerasOnlyProvider(session=None, config={})
 
     data = await provider.async_update()
 
@@ -46,7 +46,7 @@ async def test_update_composes_supported_capabilities():
 
 async def test_unsupported_capabilities_return_empty_list():
     """Default capability methods return empty lists."""
-    provider = CamerasOnlyProvider(session=None)
+    provider = CamerasOnlyProvider(session=None, config={})
 
     assert await provider.async_get_incidents() == []
     assert await provider.async_get_road_conditions() == []

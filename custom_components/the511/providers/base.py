@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
+from typing import Any
+
 from aiohttp import ClientSession
 
 from ..models import (
@@ -20,6 +23,11 @@ class BaseProvider:
     attributes and implement the ``async_get_*`` methods for each
     supported capability. Unsupported capabilities return empty results
     so callers can treat every provider uniformly.
+
+    Providers receive the config entry data at construction time via
+    ``config`` and read the keys they need from it. Keys listed in
+    ``required_config_keys`` are collected by the config flow; keys in
+    ``secret_config_keys`` are rendered as password inputs there.
     """
 
     #: Unique slug used to look this provider up in the registry and in
@@ -40,14 +48,26 @@ class BaseProvider:
     supports_travel_times: bool = False
     supports_message_signs: bool = False
 
-    def __init__(self, session: ClientSession) -> None:
-        """Initialize the provider with a shared aiohttp session."""
+    #: Config entry data keys the provider requires at setup.
+    required_config_keys: tuple[str, ...] = ()
+
+    #: Subset of ``required_config_keys`` rendered as secret inputs.
+    secret_config_keys: tuple[str, ...] = ()
+
+    def __init__(self, session: ClientSession, config: Mapping[str, Any]) -> None:
+        """Initialize the provider with a session and config entry data."""
         self._session = session
+        self._config = config
 
     @property
     def session(self) -> ClientSession:
         """Return the shared aiohttp session."""
         return self._session
+
+    @property
+    def config(self) -> Mapping[str, Any]:
+        """Return the raw config entry data for this provider."""
+        return self._config
 
     async def async_update(self) -> ProviderData:
         """Fetch all supported data in a single update pass."""
