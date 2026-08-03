@@ -3,7 +3,9 @@
 Data source: https://sc.cdn.iteris-atis.com — the Iteris/ATG GeoJSON
 CDN that feeds sc511.org. Layers are open (no developer key needed):
 ``cameras`` (one feature per camera, stills on scdotsnap), live
-``incident`` events, and planned ``construction`` road work.
+``incident`` events, and planned ``construction`` road work. The
+``dms`` layer is variable-speed-limit only (no sign text), so message
+signs are left disabled.
 """
 
 from __future__ import annotations

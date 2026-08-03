@@ -19,6 +19,7 @@ from .const import (
     CONF_INCIDENT_RADIUS,
     CONF_MAX_CAMERAS,
     CONF_MAX_INCIDENTS,
+    CONF_MAX_MESSAGE_SIGNS,
     CONF_MAX_ROAD_CONDITIONS,
     CONF_MAX_TRAVEL_TIMES,
     CONF_PROVIDER,
@@ -26,6 +27,7 @@ from .const import (
     DEFAULT_INCIDENT_RADIUS,
     DEFAULT_MAX_CAMERAS,
     DEFAULT_MAX_INCIDENTS,
+    DEFAULT_MAX_MESSAGE_SIGNS,
     DEFAULT_MAX_ROAD_CONDITIONS,
     DEFAULT_MAX_TRAVEL_TIMES,
     DEFAULT_SHOW_ROADWORK,
@@ -195,6 +197,10 @@ def _build_options_schema(config_entry: ConfigEntry) -> vol.Schema:
                     CONF_MAX_ROAD_CONDITIONS, DEFAULT_MAX_ROAD_CONDITIONS
                 ),
             ): _count_selector("roads"),
+            vol.Required(
+                CONF_MAX_MESSAGE_SIGNS,
+                default=options.get(CONF_MAX_MESSAGE_SIGNS, DEFAULT_MAX_MESSAGE_SIGNS),
+            ): _count_selector("signs"),
             vol.Required(
                 CONF_SHOW_ROADWORK,
                 default=options.get(CONF_SHOW_ROADWORK, DEFAULT_SHOW_ROADWORK),

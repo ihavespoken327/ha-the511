@@ -30,6 +30,7 @@ def test_south_dakota_capabilities():
 
     assert provider.supports_cameras
     assert not provider.supports_incidents
+    assert not provider.supports_message_signs
     assert provider.cameras_nested
     assert not provider.supports_road_conditions
     assert not provider.supports_weather

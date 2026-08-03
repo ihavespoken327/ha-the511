@@ -21,19 +21,27 @@ from .const import (
     CONF_INCIDENT_RADIUS,
     CONF_MAX_CAMERAS,
     CONF_MAX_INCIDENTS,
+    CONF_MAX_MESSAGE_SIGNS,
     CONF_MAX_ROAD_CONDITIONS,
     CONF_MAX_TRAVEL_TIMES,
     CONF_SHOW_ROADWORK,
     DEFAULT_INCIDENT_RADIUS,
     DEFAULT_MAX_CAMERAS,
     DEFAULT_MAX_INCIDENTS,
+    DEFAULT_MAX_MESSAGE_SIGNS,
     DEFAULT_MAX_ROAD_CONDITIONS,
     DEFAULT_MAX_TRAVEL_TIMES,
     DEFAULT_SHOW_ROADWORK,
     KM_PER_MILE,
     MAX_ENTITY_NAME_LENGTH,
 )
-from .models import CameraData, IncidentData, RoadConditionData, TravelTimeData
+from .models import (
+    CameraData,
+    IncidentData,
+    MessageSignData,
+    RoadConditionData,
+    TravelTimeData,
+)
 
 T = TypeVar("T")
 
@@ -93,6 +101,21 @@ def select_cameras(
         cameras,
         max_count,
         coordinates=lambda camera: (camera.latitude, camera.longitude),
+    )
+
+
+def select_message_signs(
+    hass: HomeAssistant, entry: ConfigEntry, signs: Sequence[MessageSignData]
+) -> list[MessageSignData]:
+    """Return message signs to surface: the nearest ``max_message_signs`` to home."""
+    max_count = int(
+        entry.options.get(CONF_MAX_MESSAGE_SIGNS, DEFAULT_MAX_MESSAGE_SIGNS)
+    )
+    return _nearest(
+        hass,
+        signs,
+        max_count,
+        coordinates=lambda sign: (sign.latitude, sign.longitude),
     )
 
 

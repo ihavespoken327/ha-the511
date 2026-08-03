@@ -9,15 +9,15 @@ Cameras & Road Conditions
 
 > [!WARNING]
 > Work in progress. Cameras, incidents, road conditions, weather stations,
-> travel times, incident map markers, multi-provider support, and entity
-> bounds are all implemented. Providers are available for Wisconsin,
-> Louisiana, Alaska, New York, Georgia, Arizona, Connecticut, Florida,
-> Idaho, Nevada, and Utah, plus the Canadian provinces Alberta, Ontario,
-> Newfoundland & Labrador, Manitoba, New Brunswick, Saskatchewan, and Nova
-> Scotia, North Carolina, Pennsylvania, and Yukon, and the Iteris/ATG
-> states South Carolina, Montana, and South Dakota (capabilities vary by
-> provider). Most require the provider's own free 511 developer API key;
-> Alberta, Ontario, and the Iteris/ATG states publish openly and need no
+> travel times, dynamic message signs, incident map markers, multi-provider
+> support, and entity bounds are all implemented. Providers are available for
+> Wisconsin, Louisiana, Alaska, New York, Georgia, Arizona, Connecticut,
+> Florida, Idaho, Nevada, and Utah, plus the Canadian provinces Alberta,
+> Ontario, Newfoundland & Labrador, Manitoba, New Brunswick, Saskatchewan,
+> and Nova Scotia, North Carolina, Pennsylvania, and Yukon, and the
+> Iteris/ATG states South Carolina, Montana, and South Dakota (capabilities
+> vary by provider). Most require the provider's own free 511 developer API
+> key; Alberta, Ontario, and the Iteris/ATG states publish openly and need no
 > key.
 
 ## Entity bounds (options flow)
@@ -34,13 +34,18 @@ dialog (Settings > Devices & Services > The 511 > Options):
 | Incident search radius | 50 mi | Drops incidents farther than this from home |
 | Maximum travel time routes | 25 | Keeps the `N` routes nearest to home |
 | Maximum road conditions | 25 | Keeps the first `N` road conditions by road name |
+| Maximum message signs | 25 | Keeps the `N` message signs nearest to home |
 | Show planned roadwork | off | Planned construction events dominate the feed; hidden by default |
 
-- Cameras, incidents, and travel times are ranked by straight-line distance
-  from your HA home coordinates, nearest first.
+- Cameras, incidents, travel times, and message signs are ranked by
+  straight-line distance from your HA home coordinates, nearest first.
 - Road conditions carry no coordinates, so they are capped by road name
   (sorted) rather than by distance. Feeds that return several readings for
   one roadway are collapsed to a single road condition.
+- Message signs report the sign's current text, which the provider may publish
+  with markup (`<br>` etc.) stripped; only providers whose 511 feed actually
+  serves sign text enable them (Montana's `dms` layer does; South Carolina's
+  `dms` layer is VSL-only and stays disabled).
 - Incidents without coordinates always surface (subject to the cap).
 - Entity display names are capped at 100 characters so their `entity_id`s stay
   well inside HA's limit, even for long closure/detour titles.
@@ -124,6 +129,7 @@ pytest
 | 16 | North Carolina, Pennsylvania, and Yukon on the Travel-IQ base | ✅ |
 | 17 | South Carolina, Montana, and South Dakota on a new Iteris/ATG GeoJSON base | ✅ |
 | 18 | Road-condition dedupe fix (one sensor per road name) | ✅ |
+| 19 | Dynamic message sign sensors (Montana `dms` layer) | ✅ |
 
 ## License
 

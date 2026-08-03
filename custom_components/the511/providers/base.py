@@ -10,6 +10,7 @@ from aiohttp import ClientSession
 from ..models import (
     CameraData,
     IncidentData,
+    MessageSignData,
     ProviderData,
     RoadConditionData,
     TravelTimeData,
@@ -83,6 +84,8 @@ class BaseProvider:
             data.weather_stations = await self.async_get_weather()
         if self.supports_travel_times:
             data.travel_times = await self.async_get_travel_times()
+        if self.supports_message_signs:
+            data.message_signs = await self.async_get_message_signs()
         return data
 
     async def async_get_cameras(self) -> list[CameraData]:
@@ -104,4 +107,8 @@ class BaseProvider:
 
     async def async_get_travel_times(self) -> list[TravelTimeData]:
         """Return travel times. Override when ``supports_travel_times`` is True."""
+        return []
+
+    async def async_get_message_signs(self) -> list[MessageSignData]:
+        """Return message signs. Override when ``supports_message_signs`` is True."""
         return []

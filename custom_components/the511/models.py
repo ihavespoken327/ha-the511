@@ -64,6 +64,19 @@ class WeatherStationData:
 
 
 @dataclass(slots=True)
+class MessageSignData:
+    """A dynamic message sign and its current text."""
+
+    id: str
+    name: str
+    message: str | None = None
+    road: str | None = None
+    direction: str | None = None
+    latitude: float | None = None
+    longitude: float | None = None
+
+
+@dataclass(slots=True)
 class TravelTimeData:
     """Travel time for a route segment."""
 
@@ -87,6 +100,7 @@ class ProviderData:
 
     cameras: list[CameraData] = field(default_factory=list)
     incidents: list[IncidentData] = field(default_factory=list)
+    message_signs: list[MessageSignData] = field(default_factory=list)
     road_conditions: list[RoadConditionData] = field(default_factory=list)
     weather_stations: list[WeatherStationData] = field(default_factory=list)
     travel_times: list[TravelTimeData] = field(default_factory=list)

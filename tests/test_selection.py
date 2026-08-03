@@ -6,6 +6,7 @@ from custom_components.the511.const import (
     CONF_INCIDENT_RADIUS,
     CONF_MAX_CAMERAS,
     CONF_MAX_INCIDENTS,
+    CONF_MAX_MESSAGE_SIGNS,
     CONF_MAX_ROAD_CONDITIONS,
     CONF_MAX_TRAVEL_TIMES,
     CONF_SHOW_ROADWORK,
@@ -14,6 +15,7 @@ from custom_components.the511.const import (
 from custom_components.the511.models import (
     CameraData,
     IncidentData,
+    MessageSignData,
     RoadConditionData,
     TravelTimeData,
 )
@@ -23,6 +25,7 @@ from custom_components.the511.selection import (
     safe_name,
     select_cameras,
     select_incidents,
+    select_message_signs,
     select_road_conditions,
     select_travel_times,
 )
@@ -39,6 +42,7 @@ def _options(overrides: dict | None = None) -> dict:
         CONF_INCIDENT_RADIUS: 50,
         CONF_MAX_TRAVEL_TIMES: 25,
         CONF_MAX_ROAD_CONDITIONS: 25,
+        CONF_MAX_MESSAGE_SIGNS: 25,
         CONF_SHOW_ROADWORK: False,
     }
     if overrides:
@@ -88,6 +92,13 @@ def _road_condition(road: str, **fields) -> RoadConditionData:
     data = {"road": road}
     data.update(fields)
     return RoadConditionData(**data)
+
+
+def _message_sign(sign_id: str, **fields) -> MessageSignData:
+    """Build a message sign with sensible defaults and test overrides."""
+    data = {"id": sign_id, "name": f"Sign {sign_id}"}
+    data.update(fields)
+    return MessageSignData(**data)
 
 
 def test_haversine_km_zero():
@@ -246,6 +257,31 @@ def test_select_cameras_sorts_unknown_location_last():
     ]
     selected = select_cameras(hass_fake(), _entry(), cameras)
     assert [camera.id for camera in selected] == ["near", "no-coords"]
+
+
+def test_select_message_signs_ranks_nearest_first():
+    """Message signs are ranked by distance from home."""
+    signs = [
+        _message_sign(
+            "far",
+            latitude=HOME_LAT + 2.0,
+            longitude=HOME_LON,
+        ),
+        _message_sign("near", latitude=HOME_LAT, longitude=HOME_LON),
+    ]
+    selected = select_message_signs(hass_fake(), _entry(), signs)
+    assert [sign.id for sign in selected] == ["near", "far"]
+
+
+def test_select_message_signs_caps():
+    """Only the nearest max_message_signs are kept."""
+    signs = [_message_sign(f"sign-{index}") for index in range(5)]
+    selected = select_message_signs(
+        hass_fake(),
+        _entry(_options({CONF_MAX_MESSAGE_SIGNS: 2})),
+        signs,
+    )
+    assert len(selected) == 2
 
 
 def test_select_travel_times_ranks_and_caps():

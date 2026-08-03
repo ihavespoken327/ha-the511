@@ -30,6 +30,7 @@ def test_south_carolina_capabilities():
 
     assert provider.supports_cameras
     assert provider.supports_incidents
+    assert not provider.supports_message_signs
     assert not provider.supports_road_conditions
     assert not provider.supports_weather
     assert not provider.supports_travel_times

@@ -46,15 +46,16 @@ pytest
 
 ## Phase status
 
-Phases 1–17 done (bootstrap, provider framework, Wisconsin provider, camera,
+Phases 1–19 done (bootstrap, provider framework, Wisconsin provider, camera,
 incidents, road conditions, weather stations, travel times, map markers via
 `geo_location`, multi-provider support with duplicate-provider guard,
 Phase 11 entity bounds, Phase 12 road-condition bounds, Phase 13
 multi-state providers, Phase 14 eleven state providers on the Travel-IQ
 base, Phase 15 seven Canadian province providers on the same base,
 Phase 16 North Carolina, Pennsylvania, and Yukon, Phase 17 South
-Carolina, Montana, and South Dakota on a new Iteris/ATG GeoJSON base, and
-Phase 18 a road-condition dedupe fix).
+Carolina, Montana, and South Dakota on a new Iteris/ATG GeoJSON base,
+Phase 18 a road-condition dedupe fix, and Phase 19 dynamic message sign
+sensors).
 
 ### Phase 11: entity bounds + options flow
 
@@ -275,3 +276,32 @@ same road produced the same ID and HA aborted the duplicate at setup with
 …" (entity_platform.py). Fix: `select_road_conditions` collapses rows by road
 name (first reading wins) before the sort-and-cap, matching the one-entity-per
 road name platform contract. Added a dedupe test to `tests/test_selection.py`.
+
+### Phase 19: dynamic message sign sensors
+
+The Iteris `dms` layer carries live sign text, and `supports_message_signs`
+was a documented but unimplemented flag. Phase 19 builds the platform on it —
+**Montana only**, because probing showed MT's `dms` layer (75 features) is the
+only one that serves text in a `report` property; SC's `dms` (10 features) is
+VSL-only and stays disabled. Layered on the same nearest-to-home + cap +
+mirror pattern as cameras/travel times:
+
+- `models.py` — `MessageSignData` (id, name required; message, road,
+  direction, latitude, longitude optional); `ProviderData.message_signs`.
+- `providers/base.py` — default `async_get_message_signs` returns `[]`;
+  `async_update` fetches signs only when `supports_message_signs`.
+- `providers/iteris_atis.py` — `message_sign_layers = ()` /
+  `message_sign_text_field = "report"` class attrs; `async_get_message_signs`
+  loops the layers and `_parse_message_sign` reads the GeoJSON feature `id`
+  (falling back to `id`/`event_id` props) and the `name`/`DMS_name`/
+  `location_description` props, strips HTML from the text field, and takes
+  `route`/`direction`/point.
+- `providers/montana.py` — `supports_message_signs = True`,
+  `message_sign_layers = ("dms",)`. (SC's docstring records why it stays off.)
+- `selection.py`/`coordinator.py`/`config_flow.py` — `select_message_signs`
+  (nearest-to-home via `_nearest`, capped by the new `CONF_MAX_MESSAGE_SIGNS`,
+  default 25); coordinator `message_signs` property; options-flow row.
+- `sensor.py` — `The511MessageSignSensor` (`unique_id`
+  `{provider_id}-sign-{id}`, icon `mdi:sign-text`, `native_value` = current
+  text, attributes road/direction/latitude/longitude) mirrors the coordinator
+  set and sweeps stale registry entries at setup like travel times.

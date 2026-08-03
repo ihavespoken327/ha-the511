@@ -21,7 +21,7 @@ import re
 from collections.abc import Mapping
 from typing import Any
 
-from ..models import CameraData, IncidentData
+from ..models import CameraData, IncidentData, MessageSignData
 from .base import BaseProvider
 
 _LAYER_PATH = "/geojson/icons/metadata/icons.{layer}.geojson"
@@ -45,6 +45,12 @@ class IterisAtisProvider(BaseProvider):
     #: ``cameras`` features group cameras per road site (a ``cameras``
     #: array per feature) instead of one feature per camera.
     cameras_nested: bool = False
+
+    #: Layers (in fetch order) whose features are dynamic message signs.
+    message_sign_layers: tuple[str, ...] = ()
+
+    #: Property on a message-sign feature carrying the displayed text.
+    message_sign_text_field: str = "report"
 
     async def _get_layer(self, layer: str) -> list[dict[str, Any]]:
         """Fetch ``layer`` and return its features."""
@@ -72,6 +78,14 @@ class IterisAtisProvider(BaseProvider):
             for feature in await self._get_layer(layer):
                 incidents.append(self._parse_event(feature, layer))
         return incidents
+
+    async def async_get_message_signs(self) -> list[MessageSignData]:
+        """Return normalized message signs from every DMS layer."""
+        signs: list[MessageSignData] = []
+        for layer in self.message_sign_layers:
+            for feature in await self._get_layer(layer):
+                signs.append(self._parse_message_sign(feature))
+        return signs
 
     def _parse_camera(self, feature: dict[str, Any]) -> CameraData:
         """Convert a one-camera-per-feature layer into CameraData."""
@@ -144,6 +158,29 @@ class IterisAtisProvider(BaseProvider):
             latitude=latitude,
             longitude=longitude,
             road=props.get("route"),
+        )
+
+    def _parse_message_sign(self, feature: dict[str, Any]) -> MessageSignData:
+        """Convert a DMS feature into MessageSignData."""
+        props = feature.get("properties") or {}
+        latitude, longitude = _feature_point(feature)
+        sign_id = str(
+            props.get("id") or props.get("event_id") or feature.get("id") or "Unknown"
+        )
+        name = (
+            props.get("name")
+            or props.get("DMS_name")
+            or props.get("location_description")
+            or sign_id
+        )
+        return MessageSignData(
+            id=sign_id,
+            name=name,
+            message=_strip_html(props.get(self.message_sign_text_field)),
+            road=props.get("route"),
+            direction=props.get("direction") or props.get("dir"),
+            latitude=latitude,
+            longitude=longitude,
         )
 
 

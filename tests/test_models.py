@@ -5,6 +5,7 @@ from __future__ import annotations
 from custom_components.the511.models import (
     CameraData,
     IncidentData,
+    MessageSignData,
     ProviderData,
     RoadConditionData,
     TravelTimeData,
@@ -73,12 +74,24 @@ def test_travel_time_data_defaults():
     assert travel_time.region is None
 
 
+def test_message_sign_data_defaults():
+    """Message sign optional fields default to None."""
+    sign = MessageSignData(id="s1", name="Sign")
+
+    assert sign.message is None
+    assert sign.road is None
+    assert sign.direction is None
+    assert sign.latitude is None
+    assert sign.longitude is None
+
+
 def test_provider_data_defaults_to_empty_lists():
     """ProviderData defaults every capability to an empty list."""
     data = ProviderData()
 
     assert data.cameras == []
     assert data.incidents == []
+    assert data.message_signs == []
     assert data.road_conditions == []
     assert data.weather_stations == []
     assert data.travel_times == []

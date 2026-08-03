@@ -42,6 +42,16 @@ class EventsProvider(IterisAtisProvider):
     incident_layers = ("incident", "construction")
 
 
+class MessageSignsProvider(IterisAtisProvider):
+    """A base provider with a dynamic message sign layer."""
+
+    provider_id = "signs"
+    base_url = "https://signs.example.com"
+
+    supports_message_signs = True
+    message_sign_layers = ("dms",)
+
+
 def _url(base_url: str, layer: str) -> str:
     """Build the expected CDN URL for a layer."""
     return f"{base_url}/geojson/icons/metadata/icons.{layer}.geojson"
@@ -315,3 +325,71 @@ async def test_event_report_html_is_stripped(hass, aioclient_mock):
     assert incidents[0].description == (
         "road construction in progress Travelers can expect reduced speeds."
     )
+
+
+async def test_message_sign_parse_montana_schema(hass, aioclient_mock):
+    """MT-style DMS features carry the live text in a report property."""
+    aioclient_mock.get(
+        _url(MessageSignsProvider.base_url, "dms"),
+        json={
+            "features": [
+                {
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [-112.6257733, 46.0083783],
+                    },
+                    "id": "dms_2",
+                    "properties": {
+                        "direction": "",
+                        "id": "dms_2",
+                        "mrm": "",
+                        "name": "Butte - 36-029",
+                        "report": "STAY ALIVE<br><br>DON'T DRINK & DRIVE",
+                        "route": "",
+                    },
+                }
+            ]
+        },
+    )
+
+    signs = await _provider(hass, MessageSignsProvider).async_get_message_signs()
+
+    assert len(signs) == 1
+    sign = signs[0]
+    assert sign.id == "dms_2"
+    assert sign.name == "Butte - 36-029"
+    assert sign.message == "STAY ALIVE DON'T DRINK & DRIVE"
+    assert sign.latitude == 46.0083783
+    assert sign.longitude == -112.6257733
+
+
+async def test_message_sign_parse_without_text(hass, aioclient_mock):
+    """SC-style VSL features (no report) parse with an empty message."""
+    aioclient_mock.get(
+        _url(MessageSignsProvider.base_url, "dms"),
+        json={
+            "features": [
+                {
+                    "geometry": {"coordinates": ["-82.4579174", "35.173688"]},
+                    "id": "dms_DMS_1086",
+                    "properties": {
+                        "event_id": "dms_DMS_1086",
+                        "DMS_name": "1086",
+                        "route": "US-25",
+                        "dir": "S",
+                        "location_description": "US 25 S @ SC/NC Line",
+                    },
+                }
+            ]
+        },
+    )
+
+    signs = await _provider(hass, MessageSignsProvider).async_get_message_signs()
+
+    assert len(signs) == 1
+    sign = signs[0]
+    assert sign.id == "dms_DMS_1086"
+    assert sign.name == "1086"
+    assert sign.message is None
+    assert sign.road == "US-25"
+    assert sign.direction == "S"

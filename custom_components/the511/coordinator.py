@@ -12,6 +12,7 @@ from .const import DOMAIN, SCAN_INTERVAL
 from .models import (
     CameraData,
     IncidentData,
+    MessageSignData,
     ProviderData,
     RoadConditionData,
     TravelTimeData,
@@ -20,6 +21,7 @@ from .providers import BaseProvider
 from .selection import (
     select_cameras,
     select_incidents,
+    select_message_signs,
     select_road_conditions,
     select_travel_times,
 )
@@ -67,6 +69,13 @@ class The511DataUpdateCoordinator(DataUpdateCoordinator[ProviderData]):
     def cameras(self) -> list[CameraData]:
         """Return the cameras the platforms should surface."""
         return select_cameras(self.hass, self.config_entry, self.data.cameras)
+
+    @property
+    def message_signs(self) -> list[MessageSignData]:
+        """Return the message signs the platforms should surface."""
+        return select_message_signs(
+            self.hass, self.config_entry, self.data.message_signs
+        )
 
     @property
     def travel_times(self) -> list[TravelTimeData]:

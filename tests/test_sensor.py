@@ -82,6 +82,39 @@ async def test_travel_time_entity(hass, fake_provider_class):
     assert state.attributes["region"] == "Dane"
 
 
+async def test_message_sign_entity(hass, fake_provider_class):
+    """Message signs should surface their current text with sign attrs."""
+    await _setup_entry(hass, fake_provider_class)
+
+    state = hass.states.get("sensor.the_511_i_94_wb_mm_258")
+    assert state is not None
+    assert state.state == "ICY ROADS"
+    assert state.attributes["road"] == "I-94"
+    assert state.attributes["direction"] == "WB"
+    assert state.attributes["latitude"] == 43.0
+    assert state.attributes["longitude"] == -89.5
+
+    entity = async_get_entity_registry(hass).async_get("sensor.the_511_i_94_wb_mm_258")
+    assert entity.unique_id == "fake-sign-dms-1"
+
+
+async def test_message_sign_leaving_cap_is_removed(hass, fake_provider_class):
+    """A message sign that leaves the selection should be removed entirely."""
+    entry = await _setup_entry(hass, fake_provider_class)
+    coordinator = hass.data[DOMAIN][entry.entry_id]
+
+    coordinator.data.message_signs = []
+    coordinator.async_update_listeners()
+    await hass.async_block_till_done()
+
+    state = hass.states.get("sensor.the_511_i_94_wb_mm_258")
+    assert state is None
+    assert (
+        async_get_entity_registry(hass).async_get("sensor.the_511_i_94_wb_mm_258")
+        is None
+    )
+
+
 async def test_road_condition_leaving_cap_is_removed(hass, fake_provider_class):
     """A road condition that leaves the selection should be removed entirely."""
     entry = await _setup_entry(hass, fake_provider_class)

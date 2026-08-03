@@ -14,7 +14,12 @@ from homeassistant.helpers.entity_registry import async_get as async_get_entity_
 from .const import DOMAIN
 from .coordinator import The511DataUpdateCoordinator
 from .entity import The511Entity
-from .models import RoadConditionData, TravelTimeData, WeatherStationData
+from .models import (
+    MessageSignData,
+    RoadConditionData,
+    TravelTimeData,
+    WeatherStationData,
+)
 from .selection import safe_name
 
 
@@ -33,6 +38,7 @@ async def async_setup_entry(
     added: set[str] = set()
     road_entities: dict[str, The511RoadConditionSensor] = {}
     travel_entities: dict[str, The511TravelTimeSensor] = {}
+    sign_entities: dict[str, The511MessageSignSensor] = {}
     entity_registry = async_get_entity_registry(hass)
 
     def sweep_stale_sensors() -> None:
@@ -54,6 +60,10 @@ async def async_setup_entry(
             | {
                 f"{coordinator.provider.provider_id}-station-{station.station_id}"
                 for station in coordinator.data.weather_stations
+            }
+            | {
+                f"{coordinator.provider.provider_id}-sign-{sign.id}"
+                for sign in coordinator.message_signs
             }
         )
         stale = [
@@ -121,13 +131,36 @@ async def async_setup_entry(
                 travel_entities[entity.travel_time_id] = entity
             async_add_entities(new)
 
+    def update_message_signs() -> None:
+        current_ids = {sign.id for sign in coordinator.message_signs}
+        for sign_id in set(sign_entities) - current_ids:
+            entity = sign_entities.pop(sign_id)
+            unique_id = entity.unique_id
+            if unique_id and (
+                registered := entity_registry.async_get_entity_id(
+                    Platform.SENSOR, DOMAIN, unique_id
+                )
+            ):
+                entity_registry.async_remove(registered)
+        new = [
+            The511MessageSignSensor(coordinator, sign)
+            for sign in coordinator.message_signs
+            if sign.id not in sign_entities
+        ]
+        if new:
+            for entity in new:
+                sign_entities[entity.sign_id] = entity
+            async_add_entities(new)
+
     sweep_stale_sensors()
     add_new_stations()
     update_road_conditions()
     update_travel_times()
+    update_message_signs()
     coordinator.async_add_listener(add_new_stations)
     coordinator.async_add_listener(update_road_conditions)
     coordinator.async_add_listener(update_travel_times)
+    coordinator.async_add_listener(update_message_signs)
 
 
 class The511RoadConditionSensor(The511Entity, SensorEntity):
@@ -276,4 +309,47 @@ class The511TravelTimeSensor(The511Entity, SensorEntity):
             "start_longitude": travel_time.start_longitude if travel_time else None,
             "end_latitude": travel_time.end_latitude if travel_time else None,
             "end_longitude": travel_time.end_longitude if travel_time else None,
+        }
+
+
+class The511MessageSignSensor(The511Entity, SensorEntity):
+    """Current text displayed on a dynamic message sign."""
+
+    def __init__(
+        self, coordinator: The511DataUpdateCoordinator, sign: MessageSignData
+    ) -> None:
+        """Initialize the message sign sensor."""
+        super().__init__(coordinator)
+        self.sign_id = sign.id
+        self._attr_unique_id = f"{coordinator.provider.provider_id}-sign-{sign.id}"
+        self._attr_name = safe_name(sign.name)
+        self._attr_icon = "mdi:sign-text"
+
+    @property
+    def _sign(self) -> MessageSignData | None:
+        """Return the freshest data for this sign, if still present."""
+        return next(
+            (
+                sign
+                for sign in self.coordinator.message_signs
+                if sign.id == self.sign_id
+            ),
+            None,
+        )
+
+    @property
+    def native_value(self) -> str | None:
+        """Return the text currently on the sign."""
+        sign = self._sign
+        return sign.message if sign else None
+
+    @property
+    def extra_state_attributes(self) -> dict[str, Any]:
+        """Return sign details as state attributes."""
+        sign = self._sign
+        return {
+            "road": sign.road if sign else None,
+            "direction": sign.direction if sign else None,
+            "latitude": sign.latitude if sign else None,
+            "longitude": sign.longitude if sign else None,
         }

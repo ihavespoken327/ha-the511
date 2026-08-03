@@ -21,6 +21,7 @@ CONF_MAX_INCIDENTS = "max_incidents"
 CONF_INCIDENT_RADIUS = "incident_radius"  # miles
 CONF_MAX_TRAVEL_TIMES = "max_travel_times"
 CONF_MAX_ROAD_CONDITIONS = "max_road_conditions"
+CONF_MAX_MESSAGE_SIGNS = "max_message_signs"
 CONF_SHOW_ROADWORK = "show_roadwork"
 
 DEFAULT_MAX_CAMERAS = 25
@@ -28,6 +29,7 @@ DEFAULT_MAX_INCIDENTS = 25
 DEFAULT_INCIDENT_RADIUS = 50  # miles
 DEFAULT_MAX_TRAVEL_TIMES = 25
 DEFAULT_MAX_ROAD_CONDITIONS = 25
+DEFAULT_MAX_MESSAGE_SIGNS = 25
 DEFAULT_SHOW_ROADWORK = False
 
 # Cap entity display names so the entity_ids derived from them stay well

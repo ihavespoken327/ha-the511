@@ -8,6 +8,7 @@ from homeassistant.const import CONF_API_KEY
 from custom_components.the511.models import (
     CameraData,
     IncidentData,
+    MessageSignData,
     RoadConditionData,
     TravelTimeData,
     WeatherStationData,
@@ -41,6 +42,7 @@ def fake_provider_class():
         supports_road_conditions = True
         supports_weather = True
         supports_travel_times = True
+        supports_message_signs = True
 
         async def async_get_cameras(self) -> list[CameraData]:
             return [
@@ -109,6 +111,19 @@ def fake_provider_class():
                     delay=2.0,
                     distance=4.0,
                     region="Dane",
+                )
+            ]
+
+        async def async_get_message_signs(self) -> list[MessageSignData]:
+            return [
+                MessageSignData(
+                    id="dms-1",
+                    name="I-94 WB @ MM 258",
+                    message="ICY ROADS",
+                    road="I-94",
+                    direction="WB",
+                    latitude=43.0,
+                    longitude=-89.5,
                 )
             ]
 

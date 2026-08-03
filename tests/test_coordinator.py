@@ -34,3 +34,5 @@ async def test_coordinator_refresh_pulls_provider_data(hass, fake_provider_class
         "ws-1"
     ]
     assert [travel_time.id for travel_time in coordinator.data.travel_times] == ["tt-1"]
+    assert [sign.id for sign in coordinator.data.message_signs] == ["dms-1"]
+    assert [sign.id for sign in coordinator.message_signs] == ["dms-1"]

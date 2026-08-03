@@ -2,9 +2,11 @@
 
 Data source: https://mt.cdn.iteris-atis.com — the Iteris/ATG GeoJSON
 CDN that feeds 511mt.net. Layers are open (no developer key needed):
-``cameras`` (grouped per road site, stills under ``camera_images``) and
-planned ``construction`` road work. The live incident layer is not
-publicly served, so incidents surface as construction events only.
+``cameras`` (grouped per road site, stills under ``camera_images``),
+planned ``construction`` road work, and ``dms`` dynamic message signs
+whose ``report`` property carries the live sign text. The live incident
+layer is not publicly served, so incidents surface as construction
+events only.
 """
 
 from __future__ import annotations
@@ -22,7 +24,10 @@ class MontanaProvider(IterisAtisProvider):
 
     supports_cameras = True
     supports_incidents = True
+    supports_message_signs = True
 
     cameras_nested = True
 
     incident_layers = ("construction",)
+
+    message_sign_layers = ("dms",)
