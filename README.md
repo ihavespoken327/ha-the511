@@ -14,9 +14,11 @@ Cameras & Road Conditions
 > Louisiana, Alaska, New York, Georgia, Arizona, Connecticut, Florida,
 > Idaho, Nevada, and Utah, plus the Canadian provinces Alberta, Ontario,
 > Newfoundland & Labrador, Manitoba, New Brunswick, Saskatchewan, and Nova
-> Scotia, North Carolina, Pennsylvania, and Yukon (capabilities vary by
+> Scotia, North Carolina, Pennsylvania, and Yukon, and the Iteris/ATG
+> states South Carolina, Montana, and South Dakota (capabilities vary by
 > provider). Most require the provider's own free 511 developer API key;
-> Alberta and Ontario publish openly and need no key.
+> Alberta, Ontario, and the Iteris/ATG states publish openly and need no
+> key.
 
 ## Entity bounds (options flow)
 
@@ -65,14 +67,16 @@ Home Assistant Entities   ← cameras, sensors, binary_sensors, images
 - **Provider plugin architecture** — each provider inherits `BaseProvider`,
   advertises capabilities (`supports_cameras`, `supports_incidents`, ...) and
   translates its native API into standardized models. Only supported entities
-  are created. Many states run on the shared Arcadis/IBI "GET" platform;
-  `TravelIQProvider` implements that API once and each provider (Wisconsin,
+  are created. Two vendor platforms are implemented as shared bases:
+  `TravelIQProvider` covers the Arcadis/IBI "GET" platform (Wisconsin,
   Louisiana, Alaska, New York, Georgia, Arizona, Connecticut, Florida,
   Idaho, Nevada, Utah, the seven Canadian provinces, North Carolina,
-  Pennsylvania, and Yukon) is a thin subclass supplying its base URL,
+  Pennsylvania, and Yukon — each a thin subclass supplying its base URL,
   capabilities, and any provider-specific resource names, API versions,
-  field aliases, or unit preferences (Alberta and Ontario omit the
-  developer key and Alberta reports metric weather).
+  field aliases, or unit preferences; Alberta and Ontario omit the
+  developer key and Alberta reports metric weather), and
+  `IterisAtisProvider` covers the Iteris/ATG GeoJSON CDN (South Carolina,
+  Montana, South Dakota — open layers, no key).
 - **Entities never perform API calls** — they read from `coordinator.data`.
 
 ## Development
@@ -117,6 +121,7 @@ pytest
 | 14 | Eleven state providers on the Travel-IQ base (NY, GA, AZ, CT, FL, ID, NV, UT) | ✅ |
 | 15 | Seven Canadian province providers on the Travel-IQ base (AB, ON, NL, MB, NB, SK, NS) | ✅ |
 | 16 | North Carolina, Pennsylvania, and Yukon on the Travel-IQ base | ✅ |
+| 17 | South Carolina, Montana, and South Dakota on a new Iteris/ATG GeoJSON base | ✅ |
 
 ## License
 

@@ -19,7 +19,8 @@ from North American 511 systems.
 
 - `custom_components/the511/` — the integration
   - `providers/` — provider plugin package (`base.py`, `registry.py`,
-    `travel_iq.py` shared "GET"-platform base, one file per state provider)
+    `travel_iq.py` shared "GET"-platform base, `iteris_atis.py` shared
+    Iteris/ATG GeoJSON base, one file per state provider)
   - `models.py` — normalized dataclasses (`CameraData`, `IncidentData`, ...)
   - `entity.py` — shared entity base classes
   - `coordinator.py`, `config_flow.py`, `diagnostics.py`, `services.py`
@@ -45,13 +46,14 @@ pytest
 
 ## Phase status
 
-Phases 1–16 done (bootstrap, provider framework, Wisconsin provider, camera,
+Phases 1–17 done (bootstrap, provider framework, Wisconsin provider, camera,
 incidents, road conditions, weather stations, travel times, map markers via
 `geo_location`, multi-provider support with duplicate-provider guard,
 Phase 11 entity bounds, Phase 12 road-condition bounds, Phase 13
 multi-state providers, Phase 14 eleven state providers on the Travel-IQ
-base, Phase 15 seven Canadian province providers on the same base, and
-Phase 16 North Carolina, Pennsylvania, and Yukon).
+base, Phase 15 seven Canadian province providers on the same base,
+Phase 16 North Carolina, Pennsylvania, and Yukon, and Phase 17 South
+Carolina, Montana, and South Dakota on a new Iteris/ATG GeoJSON base).
 
 ### Phase 11: entity bounds + options flow
 
@@ -224,3 +226,40 @@ running on other vendors (Iteris/ATG, Caltrans, ODOT, VDOT, WSDOT, etc.)
 do not expose the GET signature. `newengland511.org` answers the GET API
 with `Invalid Key` but is a multi-state consortium (ME/NH/VT/RI), not a
 single provider, and remains out of scope.
+
+### Phase 17: Iteris/ATG GeoJSON base + South Carolina, Montana, South Dakota
+
+A second vendor platform was verified live. The Iteris/ATG SPAs that power
+`sc511.org`, `sd511.org`, `511mt.net` (and, unreachable from this network,
+`cotrip.org` / `wv511.org` / `511virginia.org`) publish their traffic layers
+as open GeoJSON FeatureCollections on a per-state CDN:
+
+- `providers/iteris_atis.py` — `IterisAtisProvider(BaseProvider)`: `base_url`
+  plus `incident_layers` and `cameras_nested` class attributes. Layers live at
+  `GET https://<host>/geojson/icons/metadata/icons.<layer>.geojson`; no
+  developer key, so subclasses keep the default `required_config_keys = ()`
+  and the config flow skips credentials. Each layer is a FeatureCollection of
+  Point features; the `cameras` schema is either one feature per camera
+  (`cameras_nested = False`, SC) or a road-site feature carrying a `cameras`
+  array (`cameras_nested = True`, MT/SD). The `construction` layer feeds
+  planned road work and is tagged `event_type="Roadwork"` so the existing
+  "hide roadwork" option keeps it off by default. Helper-only units
+  (`_feature_point`, `_site_key`, `_active_status`, `_strip_html`) live in the
+  base and are covered by `tests/test_iteris_atis.py`.
+- `providers/south_carolina.py` — `sc.cdn.iteris-atis.com`, cameras (767,
+  stills on `scdotsnap`), live `incident` + `construction` events.
+- `providers/montana.py` — `mt.cdn.iteris-atis.com`, cameras (grouped per road
+  site), `construction` events only (the live incident layer is not publicly
+  served).
+- `providers/south_dakota.py` — `sd.cdn.iteris-atis.com`, cameras only (every
+  other layer returns 403).
+
+Verified live this session: SC 767 cameras / 5 events, MT 38 cameras / 78
+construction events, SD 173 cameras; camera still URLs serve real JPEGs/PNGs.
+
+Colorado, West Virginia, and Virginia run the same SPA but their data CDN is
+unreachable from this network (`co.511ia.org` fails TLS; the `geojson/` paths
+on the public portals are SPA catch-alls), so they remain out of scope pending
+a follow-up. The Iteris `dms` layers carry real message-sign text (11 on SC,
+73 on MT) but no message-sign entity platform exists yet; `supports_message_signs`
+stays False until one is built.

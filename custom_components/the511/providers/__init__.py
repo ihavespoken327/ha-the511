@@ -12,8 +12,10 @@ from .connecticut import ConnecticutProvider
 from .florida import FloridaProvider
 from .georgia import GeorgiaProvider
 from .idaho import IdahoProvider
+from .iteris_atis import IterisAtisProvider
 from .louisiana import LouisianaProvider
 from .manitoba import ManitobaProvider
+from .montana import MontanaProvider
 from .nevada import NevadaProvider
 from .new_brunswick import NewBrunswickProvider
 from .new_york import NewYorkProvider
@@ -30,6 +32,8 @@ from .registry import (
     get_provider_ids,
 )
 from .saskatchewan import SaskatchewanProvider
+from .south_carolina import SouthCarolinaProvider
+from .south_dakota import SouthDakotaProvider
 from .utah import UtahProvider
 from .wisconsin import WisconsinProvider
 from .yukon import YukonProvider
@@ -43,6 +47,7 @@ PROVIDERS[GeorgiaProvider.provider_id] = GeorgiaProvider
 PROVIDERS[IdahoProvider.provider_id] = IdahoProvider
 PROVIDERS[LouisianaProvider.provider_id] = LouisianaProvider
 PROVIDERS[ManitobaProvider.provider_id] = ManitobaProvider
+PROVIDERS[MontanaProvider.provider_id] = MontanaProvider
 PROVIDERS[NevadaProvider.provider_id] = NevadaProvider
 PROVIDERS[NewBrunswickProvider.provider_id] = NewBrunswickProvider
 PROVIDERS[NewYorkProvider.provider_id] = NewYorkProvider
@@ -52,6 +57,8 @@ PROVIDERS[NovaScotiaProvider.provider_id] = NovaScotiaProvider
 PROVIDERS[OntarioProvider.provider_id] = OntarioProvider
 PROVIDERS[PennsylvaniaProvider.provider_id] = PennsylvaniaProvider
 PROVIDERS[SaskatchewanProvider.provider_id] = SaskatchewanProvider
+PROVIDERS[SouthCarolinaProvider.provider_id] = SouthCarolinaProvider
+PROVIDERS[SouthDakotaProvider.provider_id] = SouthDakotaProvider
 PROVIDERS[UtahProvider.provider_id] = UtahProvider
 PROVIDERS[WisconsinProvider.provider_id] = WisconsinProvider
 PROVIDERS[YukonProvider.provider_id] = YukonProvider
@@ -59,6 +66,7 @@ PROVIDERS[YukonProvider.provider_id] = YukonProvider
 __all__ = [
     "PROVIDERS",
     "BaseProvider",
+    "IterisAtisProvider",
     "UnknownProviderError",
     "get_provider_class",
     "get_provider_classes",
