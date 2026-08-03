@@ -20,6 +20,53 @@ Cameras & Road Conditions
 > key; Alberta, Ontario, and the Iteris/ATG states publish openly and need no
 > key.
 
+## Installation
+
+**HACS** (recommended):
+
+1. In HACS, open **⋯ → Custom repositories**.
+2. Add `https://github.com/ihavespoken327/ha-the511` with category **Integration**.
+3. Find **The 511** in HACS, click **Download**, then **Restart** Home Assistant.
+
+**Manual:** copy the `custom_components/the511/` folder into your HA `config/custom_components/` directory and restart.
+
+## Setup
+
+1. Go to **Settings → Devices & Services → Add Integration** and search for **The 511**.
+2. Pick your state or province from the provider list.
+3. If the provider is keyed (see below), enter its developer API key when prompted. Open providers skip the credential step entirely.
+4. After setup, open the integration's **Options** dialog to tune entity bounds (cameras, incidents, travel times, road conditions, message signs) and the incident search radius.
+
+The integration polls each provider every **5 minutes** and updates entities from the latest feed. Cameras are still snapshots fetched on demand, refreshed from the same feed.
+
+## Getting a developer API key
+
+Keyed providers issue **their own** key from **their own** portal — a Wisconsin key won't work for New York. Keys are free; register a developer account on the provider's 511 site and it will issue you one. Paste it into the config flow.
+
+| Provider | Developer portal |
+|----------|------------------|
+| Wisconsin | https://511wi.gov/developers/doc |
+| Louisiana | https://511la.org/developers/doc |
+| Alaska | https://511.alaska.gov/developers/doc |
+| New York | https://511ny.org/developers/doc |
+| Georgia | https://511ga.org/developers/doc |
+| Arizona | https://az511.com/developers/doc |
+| Connecticut | https://ctroads.org/developers/doc |
+| Florida | https://fl511.com |
+| Idaho | https://511.idaho.gov/developers/doc |
+| Nevada | https://www.nvroads.com/developers/doc |
+| Utah | https://www.udottraffic.utah.gov/developers/doc (throttled to 10 calls/min) |
+| Newfoundland & Labrador | https://nl511.ca/developers/doc |
+| Manitoba | `mb511.ca` — public portal unreachable; key via the province's 511 program |
+| New Brunswick | `nb511.ca` — public portal unreachable; key via the province's 511 program |
+| Saskatchewan | `prod-sk.ibi511.com` — no public portal; key via the province's 511 program |
+| Nova Scotia | `prod-ns.ibi511.com` — no public portal; key via the province's 511 program |
+| North Carolina | https://drivenc.gov |
+| Pennsylvania | https://511pa.com |
+| Yukon | https://511yukon.ca |
+
+**No key needed** (open feeds): Alberta, Ontario, South Carolina, Montana, and South Dakota.
+
 ## Entity bounds (options flow)
 
 Live 511 feeds can carry thousands of cameras, travel-time segments, and
@@ -51,6 +98,10 @@ dialog (Settings > Devices & Services > The 511 > Options):
   well inside HA's limit, even for long closure/detour titles.
 - When an incident, route, or road condition leaves the selection it is
   removed from the entity registry, keeping the registry clean.
+
+## Screenshots
+
+Coming soon — dashboard previews will be added here once the custom cards ship.
 
 ## Providers
 
