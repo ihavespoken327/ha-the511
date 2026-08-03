@@ -45,7 +45,41 @@ pytest
 
 ## Phase status
 
-Phases 1–10 done (bootstrap, provider framework, Wisconsin provider, camera,
+Phases 1–11 done (bootstrap, provider framework, Wisconsin provider, camera,
 incidents, road conditions, weather stations, travel times, map markers via
-`geo_location`, multi-provider support with duplicate-provider guard).
-Integration is feature-complete for the current roadmap.
+`geo_location`, multi-provider support with duplicate-provider guard, and
+Phase 11 entity bounds).
+
+### Phase 11: entity bounds + options flow
+
+Live Wisconsin feeds expose thousands of cameras, travel-time segments, and
+incidents, and over-long incident titles (full closures with detour text)
+previously hard-failed entity creation. Phase 11 bounds the entity surface:
+
+- `selection.py` — `haversine_km`, `safe_name` (caps display names at 100
+  chars so `entity_id`s stay in bounds), `is_roadwork`,
+  `select_incidents`/`select_cameras`/`select_travel_times` (radius in miles,
+  nearest-to-home first, cap; items without coordinates sort last and are
+  never radius-dropped). `_nearest` is the generic ranker.
+- `const.py` — option keys `CONF_MAX_CAMERAS`, `CONF_MAX_INCIDENTS`,
+  `CONF_INCIDENT_RADIUS` (miles), `CONF_MAX_TRAVEL_TIMES`,
+  `CONF_SHOW_ROADWORK`; defaults `25 / 25 / 50 / 25 / False`;
+  `MAX_ENTITY_NAME_LENGTH = 100`; `KM_PER_MILE`.
+- `coordinator.py` — `incidents` / `cameras` / `travel_times` properties run
+  the selections against `self.config_entry` options. Platforms read these
+  filtered views, never `coordinator.data.*` directly.
+- Platforms (`binary_sensor.py`, `camera.py`, `sensor.py`, `geo_location.py`)
+  mirror the filtered sets: a dynamic set keyed by id, listeners add new
+  entities and remove dropped ones. For registry-backed entities the registry
+  entry is removed first (verified: plain `async_remove(force_remove=True)`
+  only marks them `unavailable`; removing the registry entry first scrubs it).
+  Travel times mirror via a second listener; road conditions and weather
+  stations are small stable sets and remain add-only.
+- Options flow — `The511OptionsFlowHandler` (`async_step_init`) + update
+  listener in `__init__.py` that calls
+  `hass.config_entries.async_schedule_reload(entry.entry_id)` (the
+  `async_reload_entry` API no longer exists in HA 2026.7).
+
+Deployment notes: HACS does not track the version file; it snapshots the
+latest `main` HEAD, so bump `manifest.json` `version` for clarity but HACS
+reinstall is what actually updates the installed copy.

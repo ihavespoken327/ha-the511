@@ -8,14 +8,17 @@ from typing import Any
 from aiohttp import ClientError, ClientTimeout
 from homeassistant.components.camera import Camera
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.entity_registry import async_get as async_get_entity_registry
 
 from .const import DOMAIN
 from .coordinator import The511DataUpdateCoordinator
 from .entity import The511Entity
 from .models import CameraData
+from .selection import safe_name
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -25,19 +28,35 @@ async def async_setup_entry(
     entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
-    """Set up The 511 cameras from the coordinator's camera data."""
+    """Set up The 511 cameras from the coordinator's camera data.
+
+    The created set mirrors ``coordinator.cameras``: a camera that leaves
+    the filtered selection (falls out of the nearest-N cap) is removed.
+    """
     coordinator: The511DataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]
-    added: set[str] = set()
+    entities: dict[str, The511Camera] = {}
+    entity_registry = async_get_entity_registry(hass)
 
     def add_new_cameras() -> None:
-        entities = [
+        current_ids = {camera.id for camera in coordinator.cameras}
+        for camera_id in set(entities) - current_ids:
+            entity = entities.pop(camera_id)
+            unique_id = entity.unique_id
+            if unique_id and (
+                registered := entity_registry.async_get_entity_id(
+                    Platform.CAMERA, DOMAIN, unique_id
+                )
+            ):
+                entity_registry.async_remove(registered)
+        new = [
             The511Camera(coordinator, camera)
-            for camera in coordinator.data.cameras
-            if camera.id not in added
+            for camera in coordinator.cameras
+            if camera.id not in entities
         ]
-        if entities:
-            added.update(entity.camera_id for entity in entities)
-            async_add_entities(entities)
+        if new:
+            for entity in new:
+                entities[entity.camera_id] = entity
+            async_add_entities(new)
 
     add_new_cameras()
     coordinator.async_add_listener(add_new_cameras)
@@ -54,7 +73,7 @@ class The511Camera(The511Entity, Camera):
         Camera.__init__(self)
         self.camera_id = camera.id
         self._attr_unique_id = f"{coordinator.provider.provider_id}-{camera.id}"
-        self._attr_name = camera.name
+        self._attr_name = safe_name(camera.name)
         self._attr_icon = "mdi:cctv"
 
     @property
@@ -63,7 +82,7 @@ class The511Camera(The511Entity, Camera):
         return next(
             (
                 camera
-                for camera in self.coordinator.data.cameras
+                for camera in self.coordinator.cameras
                 if camera.id == self.camera_id
             ),
             None,

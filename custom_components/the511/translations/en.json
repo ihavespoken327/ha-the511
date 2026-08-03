@@ -23,5 +23,20 @@
       }
     },
     "error": {}
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "The 511 options",
+        "description": "Limit how many of each entity type The 511 creates. Cameras, incidents, and travel times are ranked by distance from home, nearest first. Incidents without a location are always shown (subject to the cap).",
+        "data": {
+          "max_cameras": "Maximum cameras",
+          "max_incidents": "Maximum incidents",
+          "incident_radius": "Incident search radius",
+          "max_travel_times": "Maximum travel time routes",
+          "show_roadwork": "Show planned roadwork"
+        }
+      }
+    }
   }
 }

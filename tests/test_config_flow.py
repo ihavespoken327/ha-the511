@@ -7,7 +7,15 @@ from unittest.mock import patch
 from homeassistant import config_entries
 from homeassistant.const import CONF_API_KEY, CONF_NAME
 
-from custom_components.the511.const import CONF_PROVIDER, DOMAIN
+from custom_components.the511.const import (
+    CONF_INCIDENT_RADIUS,
+    CONF_MAX_CAMERAS,
+    CONF_MAX_INCIDENTS,
+    CONF_MAX_TRAVEL_TIMES,
+    CONF_PROVIDER,
+    CONF_SHOW_ROADWORK,
+    DOMAIN,
+)
 
 
 async def test_user_step_aborts_without_providers(hass):
@@ -148,3 +156,57 @@ async def test_different_providers_create_two_entries(
 
     assert result["type"] == "create_entry"
     assert len(hass.config_entries.async_entries(DOMAIN)) == 2
+
+
+async def test_options_flow_shows_form(hass, fake_provider_class):
+    """The options flow should present the entity-bound schema."""
+    result = await hass.config_entries.flow.async_init(
+        DOMAIN, context={"source": config_entries.SOURCE_USER}
+    )
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {CONF_NAME: "Wisconsin", CONF_PROVIDER: "fake"},
+    )
+    entry = hass.config_entries.async_entries(DOMAIN)[0]
+
+    result = await hass.config_entries.options.async_init(entry.entry_id)
+
+    assert result["type"] == "form"
+    assert result["step_id"] == "init"
+    assert CONF_MAX_CAMERAS in result["data_schema"].schema
+    assert CONF_MAX_INCIDENTS in result["data_schema"].schema
+    assert CONF_INCIDENT_RADIUS in result["data_schema"].schema
+    assert CONF_MAX_TRAVEL_TIMES in result["data_schema"].schema
+    assert CONF_SHOW_ROADWORK in result["data_schema"].schema
+
+
+async def test_options_flow_updates_entry(hass, fake_provider_class):
+    """Submitting the options form should persist the new values."""
+    result = await hass.config_entries.flow.async_init(
+        DOMAIN, context={"source": config_entries.SOURCE_USER}
+    )
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {CONF_NAME: "Wisconsin", CONF_PROVIDER: "fake"},
+    )
+    entry = hass.config_entries.async_entries(DOMAIN)[0]
+
+    result = await hass.config_entries.options.async_init(entry.entry_id)
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"],
+        {
+            CONF_MAX_CAMERAS: 10,
+            CONF_MAX_INCIDENTS: 5,
+            CONF_INCIDENT_RADIUS: 25,
+            CONF_MAX_TRAVEL_TIMES: 10,
+            CONF_SHOW_ROADWORK: True,
+        },
+    )
+
+    assert result["type"] == "create_entry"
+    options = hass.config_entries.async_get_entry(entry.entry_id).options
+    assert options[CONF_MAX_CAMERAS] == 10
+    assert options[CONF_MAX_INCIDENTS] == 5
+    assert options[CONF_INCIDENT_RADIUS] == 25
+    assert options[CONF_MAX_TRAVEL_TIMES] == 10
+    assert options[CONF_SHOW_ROADWORK] is True

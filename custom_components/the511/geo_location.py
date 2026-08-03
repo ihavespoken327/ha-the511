@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from math import asin, cos, radians, sin, sqrt
-
 from homeassistant.components.geo_location import GeolocationEvent
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import UnitOfLength
@@ -14,6 +12,7 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import DOMAIN, NAME
 from .coordinator import The511DataUpdateCoordinator
 from .models import IncidentData
+from .selection import haversine_km, safe_name
 
 
 async def async_setup_entry(
@@ -26,11 +25,11 @@ async def async_setup_entry(
     entities: dict[str, The511IncidentGeolocation] = {}
 
     def update_markers() -> None:
-        current_ids = {incident.id for incident in coordinator.data.incidents}
+        current_ids = {incident.id for incident in coordinator.incidents}
         for incident_id in set(entities) - current_ids:
             entity = entities.pop(incident_id)
             hass.async_create_task(entity.async_remove(force_remove=True))
-        for incident in coordinator.data.incidents:
+        for incident in coordinator.incidents:
             if incident.id not in entities:
                 entity = The511IncidentGeolocation(coordinator, incident)
                 entities[incident.id] = entity
@@ -69,7 +68,7 @@ class The511IncidentGeolocation(
         return next(
             (
                 incident
-                for incident in self.coordinator.data.incidents
+                for incident in self.coordinator.incidents
                 if incident.id == self.incident_id
             ),
             None,
@@ -77,7 +76,7 @@ class The511IncidentGeolocation(
 
     def _refresh(self, incident: IncidentData | None) -> None:
         """Update the marker position from the freshest incident data."""
-        self._attr_name = incident.title if incident else "Unknown"
+        self._attr_name = safe_name(incident.title if incident else None)
         self._attr_latitude = incident.latitude if incident else None
         self._attr_longitude = incident.longitude if incident else None
         self._attr_distance = self._distance_to_home(incident)
@@ -95,7 +94,7 @@ class The511IncidentGeolocation(
         home_longitude = self.hass.config.longitude
         if home_latitude is None or home_longitude is None:
             return None
-        return _haversine_km(
+        return haversine_km(
             home_latitude, home_longitude, incident.latitude, incident.longitude
         )
 
@@ -103,15 +102,3 @@ class The511IncidentGeolocation(
         """Refresh the marker when the coordinator publishes new data."""
         self._refresh(self._incident)
         self.async_write_ha_state()
-
-
-def _haversine_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
-    """Return the great-circle distance between two coordinates in kilometers."""
-    earth_radius_km = 6371.0
-    delta_lat = radians(lat2 - lat1)
-    delta_lon = radians(lon2 - lon1)
-    a = (
-        sin(delta_lat / 2) ** 2
-        + cos(radians(lat1)) * cos(radians(lat2)) * sin(delta_lon / 2) ** 2
-    )
-    return earth_radius_km * 2 * asin(sqrt(a))

@@ -9,8 +9,9 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from .const import DOMAIN, SCAN_INTERVAL
-from .models import ProviderData
+from .models import CameraData, IncidentData, ProviderData, TravelTimeData
 from .providers import BaseProvider
+from .selection import select_cameras, select_incidents, select_travel_times
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -45,3 +46,18 @@ class The511DataUpdateCoordinator(DataUpdateCoordinator[ProviderData]):
     async def _async_update_data(self) -> ProviderData:
         """Fetch fresh data from the configured provider."""
         return await self.provider.async_update()
+
+    @property
+    def incidents(self) -> list[IncidentData]:
+        """Return the incidents the platforms should surface."""
+        return select_incidents(self.hass, self.config_entry, self.data.incidents)
+
+    @property
+    def cameras(self) -> list[CameraData]:
+        """Return the cameras the platforms should surface."""
+        return select_cameras(self.hass, self.config_entry, self.data.cameras)
+
+    @property
+    def travel_times(self) -> list[TravelTimeData]:
+        """Return the travel times the platforms should surface."""
+        return select_travel_times(self.hass, self.config_entry, self.data.travel_times)

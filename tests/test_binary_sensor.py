@@ -53,8 +53,8 @@ async def test_incident_entity_has_stable_unique_id(hass, fake_provider_class):
     assert entity.unique_id == "fake-incident-inc-1"
 
 
-async def test_cleared_incident_turns_off(hass, fake_provider_class):
-    """An incident that disappears should read off, not unavailable."""
+async def test_cleared_incident_is_removed(hass, fake_provider_class):
+    """An incident that leaves the selection should be removed entirely."""
     entry = await _setup_entry(hass, fake_provider_class)
     coordinator = hass.data[DOMAIN][entry.entry_id]
 
@@ -63,5 +63,8 @@ async def test_cleared_incident_turns_off(hass, fake_provider_class):
     await hass.async_block_till_done()
 
     state = hass.states.get("binary_sensor.the_511_test_incident")
-    assert state is not None
-    assert state.state == "off"
+    assert state is None
+    assert (
+        async_get_entity_registry(hass).async_get("binary_sensor.the_511_test_incident")
+        is None
+    )

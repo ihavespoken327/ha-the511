@@ -6,7 +6,7 @@ from homeassistant.const import CONF_NAME
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.the511.const import CONF_PROVIDER, DOMAIN, NAME
-from custom_components.the511.geo_location import _haversine_km
+from custom_components.the511.selection import haversine_km
 
 
 async def _setup_entry(hass, fake_provider_class):
@@ -52,8 +52,8 @@ async def test_cleared_incident_removes_marker(hass, fake_provider_class):
 
 def test_haversine_km():
     """The haversine helper should approximate the great-circle distance."""
-    distance = _haversine_km(52.3730, 4.8909, 52.3730, 4.8909)
+    distance = haversine_km(52.3730, 4.8909, 52.3730, 4.8909)
     assert distance == 0.0
 
-    distance = _haversine_km(0.0, 0.0, 0.0, 90.0)
+    distance = haversine_km(0.0, 0.0, 0.0, 90.0)
     assert 10000 < distance < 10100

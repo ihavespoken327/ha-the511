@@ -21,6 +21,13 @@ def auto_enable_custom_integrations(enable_custom_integrations):
     return enable_custom_integrations
 
 
+@pytest.fixture(autouse=True)
+def set_home_location(hass):
+    """Place home near the fake provider's data so radius filters pass."""
+    hass.config.latitude = 43.0389
+    hass.config.longitude = -89.4575
+
+
 @pytest.fixture
 def fake_provider_class():
     """Register a fake provider in the registry, unregistering afterwards."""
