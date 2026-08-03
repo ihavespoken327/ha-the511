@@ -18,8 +18,10 @@ from .nevada import NevadaProvider
 from .new_brunswick import NewBrunswickProvider
 from .new_york import NewYorkProvider
 from .newfoundland_and_labrador import NewfoundlandLabradorProvider
+from .north_carolina import NorthCarolinaProvider
 from .nova_scotia import NovaScotiaProvider
 from .ontario import OntarioProvider
+from .pennsylvania import PennsylvaniaProvider
 from .registry import (
     PROVIDERS,
     UnknownProviderError,
@@ -30,6 +32,7 @@ from .registry import (
 from .saskatchewan import SaskatchewanProvider
 from .utah import UtahProvider
 from .wisconsin import WisconsinProvider
+from .yukon import YukonProvider
 
 PROVIDERS[AlaskaProvider.provider_id] = AlaskaProvider
 PROVIDERS[AlbertaProvider.provider_id] = AlbertaProvider
@@ -44,11 +47,14 @@ PROVIDERS[NevadaProvider.provider_id] = NevadaProvider
 PROVIDERS[NewBrunswickProvider.provider_id] = NewBrunswickProvider
 PROVIDERS[NewYorkProvider.provider_id] = NewYorkProvider
 PROVIDERS[NewfoundlandLabradorProvider.provider_id] = NewfoundlandLabradorProvider
+PROVIDERS[NorthCarolinaProvider.provider_id] = NorthCarolinaProvider
 PROVIDERS[NovaScotiaProvider.provider_id] = NovaScotiaProvider
 PROVIDERS[OntarioProvider.provider_id] = OntarioProvider
+PROVIDERS[PennsylvaniaProvider.provider_id] = PennsylvaniaProvider
 PROVIDERS[SaskatchewanProvider.provider_id] = SaskatchewanProvider
 PROVIDERS[UtahProvider.provider_id] = UtahProvider
 PROVIDERS[WisconsinProvider.provider_id] = WisconsinProvider
+PROVIDERS[YukonProvider.provider_id] = YukonProvider
 
 __all__ = [
     "PROVIDERS",

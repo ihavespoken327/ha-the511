@@ -45,12 +45,13 @@ pytest
 
 ## Phase status
 
-Phases 1–15 done (bootstrap, provider framework, Wisconsin provider, camera,
+Phases 1–16 done (bootstrap, provider framework, Wisconsin provider, camera,
 incidents, road conditions, weather stations, travel times, map markers via
 `geo_location`, multi-provider support with duplicate-provider guard,
 Phase 11 entity bounds, Phase 12 road-condition bounds, Phase 13
 multi-state providers, Phase 14 eleven state providers on the Travel-IQ
-base, and Phase 15 seven Canadian province providers on the same base).
+base, Phase 15 seven Canadian province providers on the same base, and
+Phase 16 North Carolina, Pennsylvania, and Yukon).
 
 ### Phase 11: entity bounds + options flow
 
@@ -205,3 +206,21 @@ New providers and capabilities (all probed live this session):
 
 AB and ON camera `Views[].Url` are `/map/Cctv/<id>` paths serving real JPEGs,
 so no camera override was needed.
+
+### Phase 16: North Carolina, Pennsylvania, Yukon
+
+A sweep of `prod-{code}.ibi511.com` plus every unclaimed state/territory's
+own 511 domain found three more key-gated GET-platform instances (all
+confirmed via the `Invalid Key` signature on `key=test`):
+
+- `providers/north_carolina.py` — `drivenc.gov`, cameras + incidents only.
+- `providers/pennsylvania.py` — `511pa.com`, cameras + incidents only.
+- `providers/yukon.py` — `511yukon.ca` (also served via
+  `prod-yt.ibi511.com`), cameras + incidents only.
+
+None publish API docs, so they follow the Saskatchewan/Nova Scotia
+conservative pattern (platform-default cameras/event only). US states
+running on other vendors (Iteris/ATG, Caltrans, ODOT, VDOT, WSDOT, etc.)
+do not expose the GET signature. `newengland511.org` answers the GET API
+with `Invalid Key` but is a multi-state consortium (ME/NH/VT/RI), not a
+single provider, and remains out of scope.
