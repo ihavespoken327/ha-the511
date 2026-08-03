@@ -52,6 +52,40 @@ dialog (Settings > Devices & Services > The 511 > Options):
 - When an incident, route, or road condition leaves the selection it is
   removed from the entity registry, keeping the registry clean.
 
+## Providers
+
+24 providers across two vendor platforms. Capabilities vary by what each
+state/province actually publishes; `Key` means the provider needs the 511
+system's free developer API key, `Open` means the feed is public and no key
+is required.
+
+| Provider | Cameras | Incidents | Road conditions | Weather | Travel times | Message signs | Key |
+|----------|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| Wisconsin | ✅ | ✅ | ✅ | | ✅ | | Key |
+| Louisiana | ✅ | ✅ | | | ✅ | | Key |
+| Alaska | ✅ | ✅ | ✅ | ✅ | | | Key |
+| New York | ✅ | ✅ | ✅ | | | | Key |
+| Georgia | ✅ | ✅ | | | | | Key |
+| Arizona | ✅ | ✅ | | ✅ | | | Key |
+| Connecticut | | ✅ | | | | | Key |
+| Florida | ✅ | ✅ | | | | | Key |
+| Idaho | ✅ | ✅ | ✅ | ✅ | | | Key |
+| Nevada | ✅ | ✅ | ✅ | ✅ | | | Key |
+| Utah | ✅ | ✅ | ✅ | ✅ | | | Key |
+| Alberta | ✅ | ✅ | ✅ | ✅ | | | Open |
+| Ontario | ✅ | ✅ | ✅ | | | | Open |
+| Newfoundland & Labrador | ✅ | ✅ | ✅ | | | | Key |
+| Manitoba | ✅ | ✅ | ✅ | | | | Key |
+| New Brunswick | ✅ | ✅ | ✅ | | | | Key |
+| Saskatchewan | ✅ | ✅ | | | | | Key |
+| Nova Scotia | ✅ | ✅ | | | | | Key |
+| North Carolina | ✅ | ✅ | | | | | Key |
+| Pennsylvania | ✅ | ✅ | | | | | Key |
+| Yukon | ✅ | ✅ | | | | | Key |
+| South Carolina | ✅ | ✅ | | | | | Open |
+| Montana | ✅ | ✅ | | | | ✅ | Open |
+| South Dakota | ✅ | | | | | | Open |
+
 ## Architecture
 
 ```
