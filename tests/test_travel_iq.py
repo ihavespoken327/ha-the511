@@ -6,6 +6,7 @@ from homeassistant.const import CONF_API_KEY
 
 from custom_components.the511.providers.travel_iq import (
     _first_enabled_view,
+    _first_present,
     _format_wind,
     _parse_float,
     _parse_percent,
@@ -43,6 +44,15 @@ def test_format_wind_combines_direction_and_speed():
     assert _format_wind("2 mph", None) == "2 mph"
     assert _format_wind(None, "W") == "W"
     assert _format_wind(None, None) is None
+
+
+def test_first_present_returns_first_non_none_field():
+    """The first present field wins, in declaration order."""
+    mapping = {"Wind": "4 mph", "WindSpeed": "2 mph"}
+    assert _first_present(mapping, "WindSpeed", "Wind") == "2 mph"
+    assert _first_present(mapping, "Wind", "WindSpeed") == "4 mph"
+    assert _first_present({"Dewpoint": None}, "Dewpoint") is None
+    assert _first_present({}, "AirTemperature") is None
 
 
 def test_first_enabled_view_prefers_enabled():

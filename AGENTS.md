@@ -45,11 +45,12 @@ pytest
 
 ## Phase status
 
-Phases 1–13 done (bootstrap, provider framework, Wisconsin provider, camera,
+Phases 1–14 done (bootstrap, provider framework, Wisconsin provider, camera,
 incidents, road conditions, weather stations, travel times, map markers via
 `geo_location`, multi-provider support with duplicate-provider guard,
-Phase 11 entity bounds, Phase 12 road-condition bounds, and Phase 13
-multi-state providers).
+Phase 11 entity bounds, Phase 12 road-condition bounds, Phase 13
+multi-state providers, and Phase 14 eleven state providers on the Travel-IQ
+base).
 
 ### Phase 11: entity bounds + options flow
 
@@ -124,3 +125,39 @@ with `format=json`), so one base class covers the whole family:
   stations (no travel times on the Alaska portal).
 - `providers/__init__.py` registers all three; the config flow lists them
   automatically (no flow changes needed).
+
+### Phase 14: eleven state providers
+
+Eight more states run on the Arcadis/IBI "GET" platform and were added as
+thin `TravelIQProvider` subclasses. State-specific quirks are handled by
+new overridable class attributes on `travel_iq.py`, so existing providers
+keep their defaults:
+
+- `road_conditions_status_field` — JSON key carrying the surface status
+  (default `"Overall Status"`); Utah reports it as `"RoadCondition"`.
+- Weather field aliases (`weather_name_fields`, `weather_dewpoint_fields`,
+  `weather_wind_speed_fields`, ...) — the platform ships no consistent
+  weather schema across states. Nevada uses `StationName`/`Dewpoint`/`Wind`
+  (covered by the default fallback order); Utah uses `DewpointTemp`/
+  `WindSpeedAvg` (explicit override). Arizona weather has no name or
+  dewpoint at all; parsing degrades gracefully.
+- `road_conditions_resource` / `road_conditions_api_version` — Nevada and
+  Utah publish road conditions as `roadconditions` (v3 / v2 respectively),
+  not the `winterroads` v3 default; New York and Idaho keep `winterroads` v3.
+
+New providers and capabilities:
+
+- `providers/new_york.py` — cameras, incidents, road conditions (`winterroads` v3).
+- `providers/georgia.py` — cameras, incidents.
+- `providers/arizona.py` — cameras, incidents, weather (no name/dewpoint).
+- `providers/connecticut.py` — incidents only (no camera feed on CT).
+- `providers/florida.py` — cameras, incidents (verified via the platform
+  `Invalid Key` response on the v2 endpoints; Florida publishes no API docs,
+  so versions/resources use platform defaults until a real key confirms).
+- `providers/idaho.py` — cameras, incidents, road conditions, weather.
+- `providers/nevada.py` — cameras, incidents, road conditions (`roadconditions` v3), weather.
+- `providers/utah.py` — cameras, incidents, road conditions (`roadconditions` v2, `RoadCondition` status), weather.
+
+New England (newengland511.org, NE-Compass/C2C XML) and Nebraska
+(511.nebraska.gov, federal CARS) are different platforms, not GET, and are
+out of scope.

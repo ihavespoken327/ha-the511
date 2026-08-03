@@ -52,6 +52,22 @@ class TravelIQProvider(BaseProvider):
     road_conditions_resource: str = "winterroads"
     weather_resource: str = "weatherstations"
 
+    #: JSON field carrying the road surface condition (state-dependent).
+    road_conditions_status_field: str = "Overall Status"
+
+    #: JSON field names for weather stations (state-dependent; the platform
+    #: ships no consistent schema across states).
+    weather_name_fields: tuple[str, ...] = ("Location", "StationName", "Name")
+    weather_temperature_fields: tuple[str, ...] = ("AirTemperature",)
+    weather_humidity_fields: tuple[str, ...] = ("RelativeHumidity",)
+    weather_dewpoint_fields: tuple[str, ...] = (
+        "Dewpoint",
+        "DewpointTemperature",
+        "DewpointTemp",
+    )
+    weather_wind_speed_fields: tuple[str, ...] = ("WindSpeed", "WindSpeedAvg", "Wind")
+    weather_wind_direction_fields: tuple[str, ...] = ("Direction", "WindDirection")
+
     required_config_keys = (CONF_API_KEY,)
     secret_config_keys = (CONF_API_KEY,)
 
@@ -137,7 +153,7 @@ class TravelIQProvider(BaseProvider):
         """Convert a GET winter roads resource into RoadConditionData."""
         return RoadConditionData(
             road=condition.get("RoadwayName") or "Unknown",
-            surface=condition.get("Overall Status"),
+            surface=condition.get(self.road_conditions_status_field),
         )
 
     def _parse_weather_station(self, station: dict[str, Any]) -> WeatherStationData:
@@ -145,15 +161,25 @@ class TravelIQProvider(BaseProvider):
 
         The platform reports imperial values as strings (``"19 °F"``,
         ``"100 %"``); temperatures are converted to Celsius to match the
-        sensor platform's unit declaration.
+        sensor platform's unit declaration. Field names differ by state, so
+        each reading looks up the state-appropriate aliases in order.
         """
         return WeatherStationData(
             station_id=str(station.get("Id") or "Unknown"),
-            name=station.get("Location"),
-            temperature=_parse_temperature(station.get("AirTemperature")),
-            humidity=_parse_percent(station.get("RelativeHumidity")),
-            dewpoint=_parse_temperature(station.get("Dewpoint")),
-            wind=_format_wind(station.get("WindSpeed"), station.get("Direction")),
+            name=_first_present(station, *self.weather_name_fields),
+            temperature=_parse_temperature(
+                _first_present(station, *self.weather_temperature_fields)
+            ),
+            humidity=_parse_percent(
+                _first_present(station, *self.weather_humidity_fields)
+            ),
+            dewpoint=_parse_temperature(
+                _first_present(station, *self.weather_dewpoint_fields)
+            ),
+            wind=_format_wind(
+                _first_present(station, *self.weather_wind_speed_fields),
+                _first_present(station, *self.weather_wind_direction_fields),
+            ),
             visibility=None,
         )
 
@@ -185,6 +211,15 @@ def _first_enabled_view(
         if view.get("Status") == "Enabled":
             return view
     return views[0]
+
+
+def _first_present(mapping: dict[str, Any], *names: str) -> Any:
+    """Return the first non-None value among ``names`` in ``mapping``."""
+    for name in names:
+        value = mapping.get(name)
+        if value is not None:
+            return value
+    return None
 
 
 def _parse_float(value: Any) -> float | None:
