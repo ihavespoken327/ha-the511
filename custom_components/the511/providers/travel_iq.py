@@ -55,6 +55,11 @@ class TravelIQProvider(BaseProvider):
     #: JSON field carrying the road surface condition (state-dependent).
     road_conditions_status_field: str = "Overall Status"
 
+    #: Report weather temperatures in Celsius instead of Fahrenheit.
+    #: Canadian provinces report metric readings; the shared conversion
+    #: only applies when this is False.
+    weather_temperature_celsius: bool = False
+
     #: JSON field names for weather stations (state-dependent; the platform
     #: ships no consistent schema across states).
     weather_name_fields: tuple[str, ...] = ("Location", "StationName", "Name")
@@ -68,20 +73,27 @@ class TravelIQProvider(BaseProvider):
     weather_wind_speed_fields: tuple[str, ...] = ("WindSpeed", "WindSpeedAvg", "Wind")
     weather_wind_direction_fields: tuple[str, ...] = ("Direction", "WindDirection")
 
-    required_config_keys = (CONF_API_KEY,)
-    secret_config_keys = (CONF_API_KEY,)
+    required_config_keys: tuple[str, ...] = (CONF_API_KEY,)
+    secret_config_keys: tuple[str, ...] = (CONF_API_KEY,)
 
     @property
-    def _api_key(self) -> str:
-        """Return the configured developer API key."""
-        return str(self.config[CONF_API_KEY])
+    def _api_key(self) -> str | None:
+        """Return the configured developer API key, if any.
+
+        Alberta and Ontario publish their feeds openly, so the key is
+        optional for providers that do not list ``CONF_API_KEY`` in
+        ``required_config_keys``.
+        """
+        key = self.config.get(CONF_API_KEY)
+        return str(key) if key else None
 
     async def _get_json(self, resource: str, version: int = 2) -> Any:
         """Fetch ``resource`` and return the decoded JSON payload."""
         url = f"{self.base_url}/api/v{version}/get/{resource}"
-        async with self.session.get(
-            url, params={"key": self._api_key, "format": "json"}
-        ) as response:
+        params: dict[str, str] = {"format": "json"}
+        if self._api_key is not None:
+            params["key"] = self._api_key
+        async with self.session.get(url, params=params) as response:
             response.raise_for_status()
             return await response.json()
 
@@ -153,28 +165,33 @@ class TravelIQProvider(BaseProvider):
         """Convert a GET winter roads resource into RoadConditionData."""
         return RoadConditionData(
             road=condition.get("RoadwayName") or "Unknown",
-            surface=condition.get(self.road_conditions_status_field),
+            surface=_normalize_surface(
+                condition.get(self.road_conditions_status_field)
+            ),
         )
 
     def _parse_weather_station(self, station: dict[str, Any]) -> WeatherStationData:
         """Convert a GET weather station resource into WeatherStationData.
 
-        The platform reports imperial values as strings (``"19 °F"``,
+        The platform reports readings as strings (``"19 °F"``,
         ``"100 %"``); temperatures are converted to Celsius to match the
-        sensor platform's unit declaration. Field names differ by state, so
-        each reading looks up the state-appropriate aliases in order.
+        sensor platform's unit declaration unless the provider reports
+        Celsius natively. Field names differ by state, so each reading
+        looks up the state-appropriate aliases in order.
         """
         return WeatherStationData(
             station_id=str(station.get("Id") or "Unknown"),
             name=_first_present(station, *self.weather_name_fields),
             temperature=_parse_temperature(
-                _first_present(station, *self.weather_temperature_fields)
+                _first_present(station, *self.weather_temperature_fields),
+                from_fahrenheit=not self.weather_temperature_celsius,
             ),
             humidity=_parse_percent(
                 _first_present(station, *self.weather_humidity_fields)
             ),
             dewpoint=_parse_temperature(
-                _first_present(station, *self.weather_dewpoint_fields)
+                _first_present(station, *self.weather_dewpoint_fields),
+                from_fahrenheit=not self.weather_temperature_celsius,
             ),
             wind=_format_wind(
                 _first_present(station, *self.weather_wind_speed_fields),
@@ -235,12 +252,18 @@ def _parse_float(value: Any) -> float | None:
         return None
 
 
-def _parse_temperature(value: Any) -> float | None:
-    """Parse a Fahrenheit reading (e.g. ``"19 °F"``) into Celsius."""
-    fahrenheit = _parse_float(value)
-    if fahrenheit is None:
+def _parse_temperature(value: Any, from_fahrenheit: bool = True) -> float | None:
+    """Parse a Fahrenheit reading (e.g. ``"19 °F"``) into Celsius.
+
+    When ``from_fahrenheit`` is False the reading is already Celsius and
+    returned as-is (Canadian provinces report metric values).
+    """
+    parsed = _parse_float(value)
+    if parsed is None:
         return None
-    return round((fahrenheit - 32) * 5 / 9, 1)
+    if not from_fahrenheit:
+        return round(parsed, 1)
+    return round((parsed - 32) * 5 / 9, 1)
 
 
 def _parse_percent(value: Any) -> float | None:
@@ -248,7 +271,57 @@ def _parse_percent(value: Any) -> float | None:
     return _parse_float(value)
 
 
+def _normalize_surface(value: Any) -> str | None:
+    """Coerce a road surface value (possibly a list) into a display string."""
+    if value is None:
+        return None
+    if isinstance(value, list):
+        value = ", ".join(str(item) for item in value)
+    text = str(value).strip()
+    return text or None
+
+
 def _format_wind(speed: Any, direction: Any) -> str | None:
-    """Combine wind speed and direction into a display string."""
-    parts = [str(part).strip() for part in (direction, speed) if part]
-    return " ".join(parts) or None
+    """Combine wind speed and direction into a display string.
+
+    Numeric directions are compass bearings (degrees) and are converted
+    to a cardinal point; word directions (``"W"``, ``"NE"``) pass through.
+    """
+    parts = [part for part in (_normalize_wind_direction(direction), speed) if part]
+    return " ".join(str(part).strip() for part in parts) or None
+
+
+def _normalize_wind_direction(value: Any) -> str | None:
+    """Convert a numeric compass bearing to a cardinal point."""
+    if value is None:
+        return None
+    text = str(value).strip()
+    if _NUMBER_RE.fullmatch(text):
+        bearing = _parse_float(text)
+        if bearing is not None:
+            return _degrees_to_cardinal(bearing)
+    return text or None
+
+
+def _degrees_to_cardinal(degrees: float) -> str:
+    """Convert a compass bearing to a 16-point cardinal direction."""
+    points = (
+        "N",
+        "NNE",
+        "NE",
+        "ENE",
+        "E",
+        "ESE",
+        "SE",
+        "SSE",
+        "S",
+        "SSW",
+        "SW",
+        "WSW",
+        "W",
+        "WNW",
+        "NW",
+        "NNW",
+    )
+    index = round((degrees % 360) / 22.5) % 16
+    return points[index]

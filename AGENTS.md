@@ -45,12 +45,12 @@ pytest
 
 ## Phase status
 
-Phases 1–14 done (bootstrap, provider framework, Wisconsin provider, camera,
+Phases 1–15 done (bootstrap, provider framework, Wisconsin provider, camera,
 incidents, road conditions, weather stations, travel times, map markers via
 `geo_location`, multi-provider support with duplicate-provider guard,
 Phase 11 entity bounds, Phase 12 road-condition bounds, Phase 13
-multi-state providers, and Phase 14 eleven state providers on the Travel-IQ
-base).
+multi-state providers, Phase 14 eleven state providers on the Travel-IQ
+base, and Phase 15 seven Canadian province providers on the same base).
 
 ### Phase 11: entity bounds + options flow
 
@@ -161,3 +161,47 @@ New providers and capabilities:
 New England (newengland511.org, NE-Compass/C2C XML) and Nebraska
 (511.nebraska.gov, federal CARS) are different platforms, not GET, and are
 out of scope.
+
+### Phase 15: Canadian province providers
+
+Seven Canadian provinces were verified live (host probing + sample payloads)
+and added as `TravelIQProvider` subclasses. Provincial quirks required two
+new base capabilities:
+
+- **Open (keyless) feeds** — Alberta (`511.alberta.ca`) and Ontario
+  (`511on.ca`) publish openly. `BaseProvider.required_config_keys` defaults
+  to `()`; `TravelIQProvider` declares `required_config_keys = (CONF_API_KEY,)`
+  so subclasses must override back to `()`. `_api_key` returns `str | None`
+  and `_get_json` omits the `key` parameter when the provider has none, so
+  the config flow skips the credentials step for these two.
+- **Metric weather** — `weather_temperature_celsius = True` on
+  `TravelIQProvider` (default False) makes `_parse_weather_station` pass
+  `from_fahrenheit=False`, so Alberta's plain-Celsius readings (e.g.
+  `"14.4"`) are not converted; `_parse_temperature(value,
+  from_fahrenheit=False)` returns the value unchanged.
+- **List surfaces + bearing winds** — `_normalize_surface` joins list values
+  (Ontario reports `Condition` as a list) and `_normalize_wind_direction`
+  converts numeric compass bearings (Alberta's `WindDirection: "286"`) to
+  16-point cardinals via `_degrees_to_cardinal`; `_format_wind` now uses both.
+
+New providers and capabilities (all probed live this session):
+
+- `providers/alberta.py` — cameras, incidents, road conditions (`winterroads`
+  v3, `Primary Condition` status), weather (Celsius, `Speed` wind field).
+  Open key. Verified live data (`511.alberta.ca`, canonical; `www` → 502).
+- `providers/ontario.py` — cameras, incidents, road conditions
+  (`roadconditions` v3, `Condition` status as a list). Open key. Verified
+  live (`511on.ca`, canonical; `511.ontario.ca` DNS-fails).
+- `providers/newfoundland_and_labrador.py` — cameras, incidents, road
+  conditions (`Primary Condition`). Key-gated (`nl511.ca`).
+- `providers/manitoba.py` / `providers/new_brunswick.py` — cameras,
+  incidents, road conditions (`Primary Condition` / `Primary Conditions`).
+  Key-gated; live only at `prod-{mb,nb}.ibi511.com` (public portals
+  unreachable).
+- `providers/saskatchewan.py` / `providers/nova_scotia.py` — cameras,
+  incidents only (no public API docs and key-gated endpoints, so nothing
+  beyond the platform defaults is enabled). Key-gated; live only at
+  `prod-{sk,ns}.ibi511.com`.
+
+AB and ON camera `Views[].Url` are `/map/Cctv/<id>` paths serving real JPEGs,
+so no camera override was needed.

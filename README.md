@@ -12,8 +12,11 @@ Cameras & Road Conditions
 > travel times, incident map markers, multi-provider support, and entity
 > bounds are all implemented. Providers are available for Wisconsin,
 > Louisiana, Alaska, New York, Georgia, Arizona, Connecticut, Florida,
-> Idaho, Nevada, and Utah (capabilities vary by state); each requires the
-> state's own free 511 developer API key.
+> Idaho, Nevada, and Utah, plus the Canadian provinces Alberta, Ontario,
+> Newfoundland & Labrador, Manitoba, New Brunswick, Saskatchewan, and Nova
+> Scotia (capabilities vary by provider). Most require the state's own free
+> 511 developer API key; Alberta and Ontario publish openly and need no
+> key.
 
 ## Entity bounds (options flow)
 
@@ -63,11 +66,12 @@ Home Assistant Entities   ← cameras, sensors, binary_sensors, images
   advertises capabilities (`supports_cameras`, `supports_incidents`, ...) and
   translates its native API into standardized models. Only supported entities
   are created. Many states run on the shared Arcadis/IBI "GET" platform;
-  `TravelIQProvider` implements that API once and each state (Wisconsin,
+  `TravelIQProvider` implements that API once and each provider (Wisconsin,
   Louisiana, Alaska, New York, Georgia, Arizona, Connecticut, Florida,
-  Idaho, Nevada, Utah) is a thin subclass supplying its base URL,
-  capabilities, and any state-specific resource names, API versions, or
-  field aliases.
+  Idaho, Nevada, Utah, and the seven Canadian provinces) is a thin subclass
+  supplying its base URL, capabilities, and any provider-specific resource
+  names, API versions, field aliases, or unit preferences (Alberta and
+  Ontario omit the developer key and Alberta reports metric weather).
 - **Entities never perform API calls** — they read from `coordinator.data`.
 
 ## Development
@@ -110,6 +114,7 @@ pytest
 | 12 | Bound road condition sensors | ✅ |
 | 13 | Multi-state providers (Travel-IQ base, Louisiana, Alaska) | ✅ |
 | 14 | Eleven state providers on the Travel-IQ base (NY, GA, AZ, CT, FL, ID, NV, UT) | ✅ |
+| 15 | Seven Canadian province providers on the Travel-IQ base (AB, ON, NL, MB, NB, SK, NS) | ✅ |
 
 ## License
 
