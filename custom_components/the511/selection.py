@@ -118,13 +118,18 @@ def select_road_conditions(
     """Return road conditions to surface: the first ``max_road_conditions`` by name.
 
     Road condition resources carry no coordinates, so there is nothing to rank
-    by distance. The set is sorted by road name to keep the cap deterministic
-    across polls, then truncated.
+    by distance. Feeds can return several readings for one roadway, but the
+    sensor platform keys one entity per road name, so duplicates are collapsed
+    (first reading wins). The set is then sorted by road name to keep the cap
+    deterministic across polls, and truncated.
     """
     max_count = int(
         entry.options.get(CONF_MAX_ROAD_CONDITIONS, DEFAULT_MAX_ROAD_CONDITIONS)
     )
-    return sorted(conditions, key=lambda condition: condition.road)[:max_count]
+    unique: dict[str, RoadConditionData] = {}
+    for condition in conditions:
+        unique.setdefault(condition.road, condition)
+    return sorted(unique.values(), key=lambda condition: condition.road)[:max_count]
 
 
 def _without_roadwork(

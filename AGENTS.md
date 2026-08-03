@@ -52,8 +52,9 @@ incidents, road conditions, weather stations, travel times, map markers via
 Phase 11 entity bounds, Phase 12 road-condition bounds, Phase 13
 multi-state providers, Phase 14 eleven state providers on the Travel-IQ
 base, Phase 15 seven Canadian province providers on the same base,
-Phase 16 North Carolina, Pennsylvania, and Yukon, and Phase 17 South
-Carolina, Montana, and South Dakota on a new Iteris/ATG GeoJSON base).
+Phase 16 North Carolina, Pennsylvania, and Yukon, Phase 17 South
+Carolina, Montana, and South Dakota on a new Iteris/ATG GeoJSON base, and
+Phase 18 a road-condition dedupe fix).
 
 ### Phase 11: entity bounds + options flow
 
@@ -263,3 +264,14 @@ on the public portals are SPA catch-alls), so they remain out of scope pending
 a follow-up. The Iteris `dms` layers carry real message-sign text (11 on SC,
 73 on MT) but no message-sign entity platform exists yet; `supports_message_signs`
 stays False until one is built.
+
+### Phase 18: road-condition dedupe fix
+
+Wisconsin (and any Travel-IQ provider whose winter-roads feed returns several
+readings per `RoadwayName`) created one `The511RoadConditionSensor` per row.
+Since the sensor's `unique_id` is `{provider_id}-road-{road}`, two rows for the
+same road produced the same ID and HA aborted the duplicate at setup with
+"Platform the511 does not generate unique IDs. ID … already exists - ignoring
+…" (entity_platform.py). Fix: `select_road_conditions` collapses rows by road
+name (first reading wins) before the sort-and-cap, matching the one-entity-per
+road name platform contract. Added a dedupe test to `tests/test_selection.py`.

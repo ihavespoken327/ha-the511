@@ -296,6 +296,18 @@ def test_select_road_conditions_caps():
     assert len(selected) == 2
 
 
+def test_select_road_conditions_dedupes_by_road():
+    """Duplicate road names collapse to one entity, first reading wins."""
+    conditions = [
+        _road_condition("I-39", surface="Icy"),
+        _road_condition("I-39", surface="Wet"),
+        _road_condition("WIS 30"),
+    ]
+    selected = select_road_conditions(hass_fake(), _entry(), conditions)
+    assert [condition.road for condition in selected] == ["I-39", "WIS 30"]
+    assert selected[0].surface == "Icy"
+
+
 def test_no_home_coordinates_keeps_all_within_cap():
     """Without home coordinates everything passes the radius and is kept."""
     incidents = [

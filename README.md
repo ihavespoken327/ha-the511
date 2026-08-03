@@ -39,7 +39,8 @@ dialog (Settings > Devices & Services > The 511 > Options):
 - Cameras, incidents, and travel times are ranked by straight-line distance
   from your HA home coordinates, nearest first.
 - Road conditions carry no coordinates, so they are capped by road name
-  (sorted) rather than by distance.
+  (sorted) rather than by distance. Feeds that return several readings for
+  one roadway are collapsed to a single road condition.
 - Incidents without coordinates always surface (subject to the cap).
 - Entity display names are capped at 100 characters so their `entity_id`s stay
   well inside HA's limit, even for long closure/detour titles.
@@ -122,6 +123,7 @@ pytest
 | 15 | Seven Canadian province providers on the Travel-IQ base (AB, ON, NL, MB, NB, SK, NS) | ✅ |
 | 16 | North Carolina, Pennsylvania, and Yukon on the Travel-IQ base | ✅ |
 | 17 | South Carolina, Montana, and South Dakota on a new Iteris/ATG GeoJSON base | ✅ |
+| 18 | Road-condition dedupe fix (one sensor per road name) | ✅ |
 
 ## License
 
