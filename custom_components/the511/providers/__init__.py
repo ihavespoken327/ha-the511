@@ -4,7 +4,9 @@ Provider modules are imported here so their classes are registered in
 the ``PROVIDERS`` mapping at import time.
 """
 
+from .alaska import AlaskaProvider
 from .base import BaseProvider
+from .louisiana import LouisianaProvider
 from .registry import (
     PROVIDERS,
     UnknownProviderError,
@@ -14,6 +16,8 @@ from .registry import (
 )
 from .wisconsin import WisconsinProvider
 
+PROVIDERS[AlaskaProvider.provider_id] = AlaskaProvider
+PROVIDERS[LouisianaProvider.provider_id] = LouisianaProvider
 PROVIDERS[WisconsinProvider.provider_id] = WisconsinProvider
 
 __all__ = [

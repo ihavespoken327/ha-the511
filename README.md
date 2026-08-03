@@ -10,7 +10,9 @@ Cameras & Road Conditions
 > [!WARNING]
 > Work in progress. Cameras, incidents, road conditions, weather stations,
 > travel times, incident map markers, multi-provider support, and entity
-> bounds are all implemented for the Wisconsin provider.
+> bounds are all implemented. Providers are available for Wisconsin,
+> Louisiana, and Alaska; each requires the state's own free 511 developer
+> API key.
 
 ## Entity bounds (options flow)
 
@@ -59,7 +61,10 @@ Home Assistant Entities   ← cameras, sensors, binary_sensors, images
 - **Provider plugin architecture** — each provider inherits `BaseProvider`,
   advertises capabilities (`supports_cameras`, `supports_incidents`, ...) and
   translates its native API into standardized models. Only supported entities
-  are created.
+  are created. Many states run on the shared Arcadis/IBI "GET" platform;
+  `TravelIQProvider` implements that API once and each state (Wisconsin,
+  Louisiana, Alaska) is a thin subclass supplying its base URL and
+  capabilities.
 - **Entities never perform API calls** — they read from `coordinator.data`.
 
 ## Development
@@ -100,6 +105,7 @@ pytest
 | 10 | Multi-provider support | ✅ |
 | 11 | Entity bounds + options flow | ✅ |
 | 12 | Bound road condition sensors | ✅ |
+| 13 | Multi-state providers (Travel-IQ base, Louisiana, Alaska) | ✅ |
 
 ## License
 

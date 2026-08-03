@@ -6,15 +6,14 @@ from homeassistant.const import CONF_API_KEY
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from custom_components.the511.providers import get_provider_class
-from custom_components.the511.providers.wisconsin import (
-    CAMERAS_URL,
-    EVENTS_URL,
-    TRAVEL_TIMES_URL,
-    WINTER_ROADS_URL,
-    WisconsinProvider,
-)
+from custom_components.the511.providers.wisconsin import WisconsinProvider
 
 API_KEY = "test-key"
+
+
+def _url(resource: str, version: int = 2) -> str:
+    """Build the expected platform URL for a resource."""
+    return f"{WisconsinProvider.base_url}/api/v{version}/get/{resource}"
 
 
 def _provider(hass):
@@ -43,13 +42,19 @@ def test_wisconsin_capabilities():
 
 async def test_update_fetches_all_supported_resources(hass, aioclient_mock):
     """async_update should query every supported resource with the api key."""
-    aioclient_mock.get(CAMERAS_URL, params={"key": API_KEY, "format": "json"}, json=[])
-    aioclient_mock.get(EVENTS_URL, params={"key": API_KEY, "format": "json"}, json=[])
     aioclient_mock.get(
-        WINTER_ROADS_URL, params={"key": API_KEY, "format": "json"}, json=[]
+        _url("cameras"), params={"key": API_KEY, "format": "json"}, json=[]
     )
     aioclient_mock.get(
-        TRAVEL_TIMES_URL, params={"key": API_KEY, "format": "json"}, json=[]
+        _url("event"), params={"key": API_KEY, "format": "json"}, json=[]
+    )
+    aioclient_mock.get(
+        _url("winterroads", version=3),
+        params={"key": API_KEY, "format": "json"},
+        json=[],
+    )
+    aioclient_mock.get(
+        _url("traveltimes"), params={"key": API_KEY, "format": "json"}, json=[]
     )
 
     await _provider(hass).async_update()
@@ -60,7 +65,7 @@ async def test_update_fetches_all_supported_resources(hass, aioclient_mock):
 async def test_cameras_use_first_enabled_view(hass, aioclient_mock):
     """Camera parsing should pick the first enabled view."""
     aioclient_mock.get(
-        CAMERAS_URL,
+        _url("cameras"),
         json=[
             {
                 "Id": 42,
@@ -102,7 +107,7 @@ async def test_cameras_use_first_enabled_view(hass, aioclient_mock):
 async def test_camera_falls_back_to_first_view(hass, aioclient_mock):
     """Without an enabled view the first view should be used."""
     aioclient_mock.get(
-        CAMERAS_URL,
+        _url("cameras"),
         json=[
             {
                 "Id": 7,
@@ -122,7 +127,7 @@ async def test_camera_falls_back_to_first_view(hass, aioclient_mock):
 
 async def test_camera_missing_fields_have_stable_fallbacks(hass, aioclient_mock):
     """Missing identity fields should not produce None names or ids."""
-    aioclient_mock.get(CAMERAS_URL, json=[{}])
+    aioclient_mock.get(_url("cameras"), json=[{}])
 
     cameras = await _provider(hass).async_get_cameras()
 
@@ -134,7 +139,7 @@ async def test_camera_missing_fields_have_stable_fallbacks(hass, aioclient_mock)
 async def test_incidents_parse(hass, aioclient_mock):
     """Event resources should be normalized into incidents."""
     aioclient_mock.get(
-        EVENTS_URL,
+        _url("event"),
         json=[
             {
                 "ID": 101,
@@ -164,7 +169,7 @@ async def test_incidents_parse(hass, aioclient_mock):
 
 async def test_incident_missing_fields_have_stable_fallbacks(hass, aioclient_mock):
     """Missing event fields should fall back to Unknown for identity."""
-    aioclient_mock.get(EVENTS_URL, json=[{}])
+    aioclient_mock.get(_url("event"), json=[{}])
 
     incidents = await _provider(hass).async_get_incidents()
 
@@ -176,7 +181,7 @@ async def test_incident_missing_fields_have_stable_fallbacks(hass, aioclient_moc
 async def test_road_conditions_parse(hass, aioclient_mock):
     """Winter roads should be normalized into road conditions."""
     aioclient_mock.get(
-        WINTER_ROADS_URL,
+        _url("winterroads", version=3),
         json=[{"RoadwayName": "I-90", "Overall Status": "Partially covered"}],
     )
 
@@ -191,7 +196,7 @@ async def test_road_conditions_parse(hass, aioclient_mock):
 async def test_travel_times_parse(hass, aioclient_mock):
     """Travel time resources should be normalized into travel times."""
     aioclient_mock.get(
-        TRAVEL_TIMES_URL,
+        _url("traveltimes"),
         json=[
             {
                 "Id": "STOC-Milwaukee::2003",
@@ -227,7 +232,7 @@ async def test_travel_times_parse(hass, aioclient_mock):
 
 async def test_travel_time_missing_fields_have_stable_fallbacks(hass, aioclient_mock):
     """Missing travel time identity fields should fall back to Unknown."""
-    aioclient_mock.get(TRAVEL_TIMES_URL, json=[{}])
+    aioclient_mock.get(_url("traveltimes"), json=[{}])
 
     travel_times = await _provider(hass).async_get_travel_times()
 

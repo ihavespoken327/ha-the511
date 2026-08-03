@@ -18,8 +18,8 @@ from North American 511 systems.
 ## Repository layout
 
 - `custom_components/the511/` — the integration
-  - `providers/` — provider plugin package (`base.py`, `registry.py`, one
-    file per state provider)
+  - `providers/` — provider plugin package (`base.py`, `registry.py`,
+    `travel_iq.py` shared "GET"-platform base, one file per state provider)
   - `models.py` — normalized dataclasses (`CameraData`, `IncidentData`, ...)
   - `entity.py` — shared entity base classes
   - `coordinator.py`, `config_flow.py`, `diagnostics.py`, `services.py`
@@ -45,10 +45,11 @@ pytest
 
 ## Phase status
 
-Phases 1–12 done (bootstrap, provider framework, Wisconsin provider, camera,
+Phases 1–13 done (bootstrap, provider framework, Wisconsin provider, camera,
 incidents, road conditions, weather stations, travel times, map markers via
 `geo_location`, multi-provider support with duplicate-provider guard,
-Phase 11 entity bounds, and Phase 12 road-condition bounds).
+Phase 11 entity bounds, Phase 12 road-condition bounds, and Phase 13
+multi-state providers).
 
 ### Phase 11: entity bounds + options flow
 
@@ -102,3 +103,24 @@ coordinates, so `_nearest` could not rank them). Phase 12:
   selection (they would otherwise linger as `unavailable` restored
   entities after a cap is lowered).
 - Options flow + `translations/en.json` expose the new field.
+
+### Phase 13: multi-state providers
+
+Many state 511 systems (WI, LA, AK, NY, GA, UT, FL and more) run on the
+same Arcadis/IBI "GET" platform (`GET /api/v{version}/get/<resource>?key=`
+with `format=json`), so one base class covers the whole family:
+
+- `providers/travel_iq.py` — `TravelIQProvider(BaseProvider)`: `base_url`
+  plus per-resource API versions and resource names as class attributes;
+  shared `_get_json` and parsers for cameras, events, winter road
+  conditions, weather stations, and travel times. Weather stations arrive
+  as imperial strings (`"19 °F"`, `"100 %"`); temperatures are converted
+  to Celsius to match the sensor platform's `UnitOfTemperature.CELSIUS`.
+- `providers/wisconsin.py` — refactored onto `TravelIQProvider` (only a
+  header now); `provider_id` stays `wisconsin` so existing entities and
+  unique IDs are unchanged.
+- `providers/louisiana.py` — cameras, incidents, travel times.
+- `providers/alaska.py` — cameras, incidents, road conditions, weather
+  stations (no travel times on the Alaska portal).
+- `providers/__init__.py` registers all three; the config flow lists them
+  automatically (no flow changes needed).
