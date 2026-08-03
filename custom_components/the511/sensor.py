@@ -35,6 +35,40 @@ async def async_setup_entry(
     travel_entities: dict[str, The511TravelTimeSensor] = {}
     entity_registry = async_get_entity_registry(hass)
 
+    def sweep_stale_sensors() -> None:
+        """Remove registry entries no longer in the selection.
+
+        Runs at setup so entities registered by an earlier install (before a
+        cap was lowered) are scrubbed instead of lingering as unavailable
+        restored entities. Only owns sensor entities for this config entry.
+        """
+        current = (
+            {
+                f"{coordinator.provider.provider_id}-road-{condition.road}"
+                for condition in coordinator.road_conditions
+            }
+            | {
+                f"{coordinator.provider.provider_id}-travel-time-{travel_time.id}"
+                for travel_time in coordinator.travel_times
+            }
+            | {
+                f"{coordinator.provider.provider_id}-station-{station.station_id}"
+                for station in coordinator.data.weather_stations
+            }
+        )
+        stale = [
+            entity.entity_id
+            for entity in entity_registry.entities.values()
+            if (
+                entity.platform == DOMAIN
+                and entity.domain == Platform.SENSOR
+                and entity.config_entry_id == entry.entry_id
+                and entity.unique_id not in current
+            )
+        ]
+        for entity_id in stale:
+            entity_registry.async_remove(entity_id)
+
     def add_new_stations() -> None:
         entities: list[The511Entity] = []
         for station in coordinator.data.weather_stations:
@@ -87,6 +121,7 @@ async def async_setup_entry(
                 travel_entities[entity.travel_time_id] = entity
             async_add_entities(new)
 
+    sweep_stale_sensors()
     add_new_stations()
     update_road_conditions()
     update_travel_times()

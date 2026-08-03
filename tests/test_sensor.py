@@ -94,3 +94,42 @@ async def test_road_condition_leaving_cap_is_removed(hass, fake_provider_class):
     state = hass.states.get("sensor.the_511_i_94")
     assert state is None
     assert async_get_entity_registry(hass).async_get("sensor.the_511_i_94") is None
+
+
+async def test_stale_sensors_are_swept_at_setup(hass, fake_provider_class):
+    """Registry entries from an older install leaving the selection are removed."""
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        title=NAME,
+        data={CONF_NAME: NAME, CONF_PROVIDER: "fake"},
+    )
+    entry.add_to_hass(hass)
+    entity_registry = async_get_entity_registry(hass)
+    entity_registry.async_get_or_create(
+        "sensor",
+        DOMAIN,
+        unique_id="fake-road-OUTDATED-ROAD",
+        config_entry=entry,
+    )
+    entity_registry.async_get_or_create(
+        "sensor",
+        DOMAIN,
+        unique_id="fake-road-I-94",
+        config_entry=entry,
+    )
+
+    assert await hass.config_entries.async_setup(entry.entry_id)
+    await hass.async_block_till_done()
+
+    assert (
+        async_get_entity_registry(hass).async_get_entity_id(
+            "sensor", DOMAIN, "fake-road-OUTDATED-ROAD"
+        )
+        is None
+    )
+    assert (
+        async_get_entity_registry(hass).async_get_entity_id(
+            "sensor", DOMAIN, "fake-road-I-94"
+        )
+        is not None
+    )

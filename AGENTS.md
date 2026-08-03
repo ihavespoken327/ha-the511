@@ -97,5 +97,8 @@ coordinates, so `_nearest` could not rank them). Phase 12:
 - `coordinator.py` — `road_conditions` property runs the selection.
 - `sensor.py` — road conditions now mirror the filtered set like travel
   times: a second listener adds new roads and removes ones that leave the
-  cap (registry entry first, then entity).
+  cap (registry entry first, then entity). A startup sweep also scrubs
+  registry entries an older install registered that are no longer in the
+  selection (they would otherwise linger as `unavailable` restored
+  entities after a cap is lowered).
 - Options flow + `translations/en.json` expose the new field.
