@@ -4,6 +4,14 @@ Home Assistant custom integration **The 511** (`the511`) — traffic cameras,
 road conditions, incidents, weather stations, travel times and message signs
 from North American 511 systems.
 
+## Working arrangement
+
+- This repo/session is for **integration work** (code, tests, docs, releases):
+  modifications, fixes, and additions to `custom_components/the511/`.
+- **Dashboard/card work** is done in a separate chat: the dashboard YAML is
+  built against the live HA instance and saved under `dashboard/` here, then
+  screenshots are added to the README `## Screenshots` section.
+
 ## Project rules
 
 - **Config entries only.** Never add YAML-based configuration.
