@@ -1,7 +1,8 @@
 """New Brunswick 511 provider.
 
-Data source: hosted on the Arcadis/IBI platform (the public nb511.ca portal
-does not currently resolve, so the vendor endpoint is used directly).
+Data source: hosted on the Arcadis/IBI platform. The consumer portal is
+https://511.gnb.ca (not ``nb511.ca``); its developer page
+(``/developers/doc``) issues keys self-serve after a free account signup.
 Requires a developer API key (query string ``key``). Cameras, events, and
 winter road conditions use the same "GET" REST shape as the other
 Travel-IQ provinces; the winter-roads documentation sample reports the

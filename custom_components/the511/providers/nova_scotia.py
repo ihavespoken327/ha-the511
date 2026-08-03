@@ -1,11 +1,13 @@
 """Nova Scotia 511 provider.
 
-Data source: hosted on the Arcadis/IBI platform (no public portal domain
-resolves, so the vendor endpoint is used directly). Requires a developer
-API key (query string ``key``). Nova Scotia publishes no API
-documentation, so the capability set is limited to the resources that
-every Travel-IQ portal serves (cameras, events); road conditions, weather,
-and travel times are left disabled until a real key confirms them.
+Data source: hosted on the Arcadis/IBI platform (the consumer portal is
+https://511.novascotia.ca; the vendor's ``/developers/doc`` returns 404, so
+no self-serve developer portal exists and a key must be requested through the
+province's 511 program). Requires a developer API key (query string ``key``).
+Nova Scotia publishes no API documentation, so the capability set is limited
+to the resources that every Travel-IQ portal serves (cameras, events); road
+conditions, weather, and travel times are left disabled until a real key
+confirms them.
 """
 
 from __future__ import annotations

@@ -1,7 +1,8 @@
 """Manitoba 511 provider.
 
-Data source: hosted on the Arcadis/IBI platform (the public mb511.ca portal
-does not currently resolve, so the vendor endpoint is used directly).
+Data source: hosted on the Arcadis/IBI platform. The consumer portal is
+https://www.manitoba511.ca (not ``mb511.ca``); its developer page
+(``/developers/doc``) issues keys self-serve after a free account signup.
 Requires a developer API key (query string ``key``). Cameras, events, and
 winter road conditions use the same "GET" REST shape as the other
 Travel-IQ provinces; weather stations and travel times are not published.

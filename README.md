@@ -57,10 +57,10 @@ Keyed providers issue **their own** key from **their own** portal — a Wisconsi
 | Nevada | https://www.nvroads.com/developers/doc |
 | Utah | https://www.udottraffic.utah.gov/developers/doc (throttled to 10 calls/min) |
 | Newfoundland & Labrador | https://nl511.ca/developers/doc |
-| Manitoba | `mb511.ca` — public portal unreachable; key via the province's 511 program |
-| New Brunswick | `nb511.ca` — public portal unreachable; key via the province's 511 program |
-| Saskatchewan | `prod-sk.ibi511.com` — no public portal; key via the province's 511 program |
-| Nova Scotia | `prod-ns.ibi511.com` — no public portal; key via the province's 511 program |
+| Manitoba | https://www.manitoba511.ca/developers/doc |
+| New Brunswick | https://511.gnb.ca/developers/doc |
+| Saskatchewan | `prod-sk.ibi511.com` — no self-serve developer portal; key via the province's 511 program |
+| Nova Scotia | `prod-ns.ibi511.com` — no self-serve developer portal; key via the province's 511 program |
 | North Carolina | https://drivenc.gov |
 | Pennsylvania | https://511pa.com |
 | Yukon | https://511yukon.ca |
