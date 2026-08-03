@@ -25,15 +25,18 @@ dialog (Settings > Devices & Services > The 511 > Options):
 | Maximum incidents | 25 | Keeps the `N` incidents nearest to home |
 | Incident search radius | 50 mi | Drops incidents farther than this from home |
 | Maximum travel time routes | 25 | Keeps the `N` routes nearest to home |
+| Maximum road conditions | 25 | Keeps the first `N` road conditions by road name |
 | Show planned roadwork | off | Planned construction events dominate the feed; hidden by default |
 
 - Cameras, incidents, and travel times are ranked by straight-line distance
   from your HA home coordinates, nearest first.
+- Road conditions carry no coordinates, so they are capped by road name
+  (sorted) rather than by distance.
 - Incidents without coordinates always surface (subject to the cap).
 - Entity display names are capped at 100 characters so their `entity_id`s stay
   well inside HA's limit, even for long closure/detour titles.
-- When an incident or route leaves the selection it is removed from the
-  entity registry, keeping the registry clean.
+- When an incident, route, or road condition leaves the selection it is
+  removed from the entity registry, keeping the registry clean.
 
 ## Architecture
 
@@ -96,6 +99,7 @@ pytest
 | 9 | Map support (`geo_location` incident markers) | ✅ |
 | 10 | Multi-provider support | ✅ |
 | 11 | Entity bounds + options flow | ✅ |
+| 12 | Bound road condition sensors | ✅ |
 
 ## License
 

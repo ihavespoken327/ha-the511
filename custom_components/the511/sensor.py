@@ -25,22 +25,18 @@ async def async_setup_entry(
 ) -> None:
     """Set up The 511 sensors from the coordinator's data.
 
-    Road conditions and weather stations are small, stable sets and are
-    added once. Travel times mirror ``coordinator.travel_times`` so a route
-    that leaves the nearest-N cap is removed.
+    Weather stations are a small, stable set and are added once. Road
+    conditions and travel times mirror ``coordinator.road_conditions`` /
+    ``coordinator.travel_times`` so an item that leaves its cap is removed.
     """
     coordinator: The511DataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]
     added: set[str] = set()
+    road_entities: dict[str, The511RoadConditionSensor] = {}
     travel_entities: dict[str, The511TravelTimeSensor] = {}
     entity_registry = async_get_entity_registry(hass)
 
-    def add_new_sensors() -> None:
+    def add_new_stations() -> None:
         entities: list[The511Entity] = []
-        for condition in coordinator.data.road_conditions:
-            key = f"road-{condition.road}"
-            if key not in added:
-                added.add(key)
-                entities.append(The511RoadConditionSensor(coordinator, condition))
         for station in coordinator.data.weather_stations:
             key = f"station-{station.station_id}"
             if key not in added:
@@ -48,6 +44,27 @@ async def async_setup_entry(
                 entities.append(The511WeatherStationSensor(coordinator, station))
         if entities:
             async_add_entities(entities)
+
+    def update_road_conditions() -> None:
+        current_keys = {condition.road for condition in coordinator.road_conditions}
+        for road in set(road_entities) - current_keys:
+            entity = road_entities.pop(road)
+            unique_id = entity.unique_id
+            if unique_id and (
+                registered := entity_registry.async_get_entity_id(
+                    Platform.SENSOR, DOMAIN, unique_id
+                )
+            ):
+                entity_registry.async_remove(registered)
+        new = [
+            The511RoadConditionSensor(coordinator, condition)
+            for condition in coordinator.road_conditions
+            if condition.road not in road_entities
+        ]
+        if new:
+            for entity in new:
+                road_entities[entity.road] = entity
+            async_add_entities(new)
 
     def update_travel_times() -> None:
         current_ids = {travel_time.id for travel_time in coordinator.travel_times}
@@ -70,9 +87,11 @@ async def async_setup_entry(
                 travel_entities[entity.travel_time_id] = entity
             async_add_entities(new)
 
-    add_new_sensors()
+    add_new_stations()
+    update_road_conditions()
     update_travel_times()
-    coordinator.async_add_listener(add_new_sensors)
+    coordinator.async_add_listener(add_new_stations)
+    coordinator.async_add_listener(update_road_conditions)
     coordinator.async_add_listener(update_travel_times)
 
 

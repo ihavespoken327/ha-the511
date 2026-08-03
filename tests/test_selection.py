@@ -6,6 +6,7 @@ from custom_components.the511.const import (
     CONF_INCIDENT_RADIUS,
     CONF_MAX_CAMERAS,
     CONF_MAX_INCIDENTS,
+    CONF_MAX_ROAD_CONDITIONS,
     CONF_MAX_TRAVEL_TIMES,
     CONF_SHOW_ROADWORK,
     MAX_ENTITY_NAME_LENGTH,
@@ -13,6 +14,7 @@ from custom_components.the511.const import (
 from custom_components.the511.models import (
     CameraData,
     IncidentData,
+    RoadConditionData,
     TravelTimeData,
 )
 from custom_components.the511.selection import (
@@ -21,6 +23,7 @@ from custom_components.the511.selection import (
     safe_name,
     select_cameras,
     select_incidents,
+    select_road_conditions,
     select_travel_times,
 )
 
@@ -35,6 +38,7 @@ def _options(overrides: dict | None = None) -> dict:
         CONF_MAX_INCIDENTS: 25,
         CONF_INCIDENT_RADIUS: 50,
         CONF_MAX_TRAVEL_TIMES: 25,
+        CONF_MAX_ROAD_CONDITIONS: 25,
         CONF_SHOW_ROADWORK: False,
     }
     if overrides:
@@ -77,6 +81,13 @@ def _travel_time(travel_time_id: str, **fields) -> TravelTimeData:
     }
     data.update(fields)
     return TravelTimeData(**data)
+
+
+def _road_condition(road: str, **fields) -> RoadConditionData:
+    """Build a road condition with a road name and test overrides."""
+    data = {"road": road}
+    data.update(fields)
+    return RoadConditionData(**data)
 
 
 def test_haversine_km_zero():
@@ -257,6 +268,32 @@ def test_select_travel_times_ranks_and_caps():
         travel_times,
     )
     assert [travel_time.id for travel_time in selected] == ["near"]
+
+
+def test_select_road_conditions_sorts_alphabetically():
+    """Road conditions are ordered by road name, independent of feed order."""
+    conditions = [
+        _road_condition("US 12/18"),
+        _road_condition("I-39/90"),
+        _road_condition("WIS 30"),
+    ]
+    selected = select_road_conditions(hass_fake(), _entry(), conditions)
+    assert [condition.road for condition in selected] == [
+        "I-39/90",
+        "US 12/18",
+        "WIS 30",
+    ]
+
+
+def test_select_road_conditions_caps():
+    """Only the first max_road_conditions by name are kept."""
+    conditions = [_road_condition(f"road-{index}") for index in range(5)]
+    selected = select_road_conditions(
+        hass_fake(),
+        _entry(_options({CONF_MAX_ROAD_CONDITIONS: 2})),
+        conditions,
+    )
+    assert len(selected) == 2
 
 
 def test_no_home_coordinates_keeps_all_within_cap():

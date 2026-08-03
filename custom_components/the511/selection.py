@@ -21,17 +21,19 @@ from .const import (
     CONF_INCIDENT_RADIUS,
     CONF_MAX_CAMERAS,
     CONF_MAX_INCIDENTS,
+    CONF_MAX_ROAD_CONDITIONS,
     CONF_MAX_TRAVEL_TIMES,
     CONF_SHOW_ROADWORK,
     DEFAULT_INCIDENT_RADIUS,
     DEFAULT_MAX_CAMERAS,
     DEFAULT_MAX_INCIDENTS,
+    DEFAULT_MAX_ROAD_CONDITIONS,
     DEFAULT_MAX_TRAVEL_TIMES,
     DEFAULT_SHOW_ROADWORK,
     KM_PER_MILE,
     MAX_ENTITY_NAME_LENGTH,
 )
-from .models import CameraData, IncidentData, TravelTimeData
+from .models import CameraData, IncidentData, RoadConditionData, TravelTimeData
 
 T = TypeVar("T")
 
@@ -108,6 +110,21 @@ def select_travel_times(
             travel_time.start_longitude,
         ),
     )
+
+
+def select_road_conditions(
+    hass: HomeAssistant, entry: ConfigEntry, conditions: Sequence[RoadConditionData]
+) -> list[RoadConditionData]:
+    """Return road conditions to surface: the first ``max_road_conditions`` by name.
+
+    Road condition resources carry no coordinates, so there is nothing to rank
+    by distance. The set is sorted by road name to keep the cap deterministic
+    across polls, then truncated.
+    """
+    max_count = int(
+        entry.options.get(CONF_MAX_ROAD_CONDITIONS, DEFAULT_MAX_ROAD_CONDITIONS)
+    )
+    return sorted(conditions, key=lambda condition: condition.road)[:max_count]
 
 
 def _without_roadwork(

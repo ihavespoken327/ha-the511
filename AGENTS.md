@@ -45,10 +45,10 @@ pytest
 
 ## Phase status
 
-Phases 1–11 done (bootstrap, provider framework, Wisconsin provider, camera,
+Phases 1–12 done (bootstrap, provider framework, Wisconsin provider, camera,
 incidents, road conditions, weather stations, travel times, map markers via
-`geo_location`, multi-provider support with duplicate-provider guard, and
-Phase 11 entity bounds).
+`geo_location`, multi-provider support with duplicate-provider guard,
+Phase 11 entity bounds, and Phase 12 road-condition bounds).
 
 ### Phase 11: entity bounds + options flow
 
@@ -83,3 +83,19 @@ previously hard-failed entity creation. Phase 11 bounds the entity surface:
 Deployment notes: HACS does not track the version file; it snapshots the
 latest `main` HEAD, so bump `manifest.json` `version` for clarity but HACS
 reinstall is what actually updates the installed copy.
+
+### Phase 12: road-condition bounds
+
+Live Wisconsin winter-roads data exposed ~190 road conditions, one sensor
+each, that Phase 11's caps did not reach (road conditions have no
+coordinates, so `_nearest` could not rank them). Phase 12:
+
+- `const.py` — `CONF_MAX_ROAD_CONDITIONS` / `DEFAULT_MAX_ROAD_CONDITIONS = 25`.
+- `selection.py` — `select_road_conditions` sorts by road name and truncates
+  to the cap (deterministic across polls since there is nothing to rank by
+  distance).
+- `coordinator.py` — `road_conditions` property runs the selection.
+- `sensor.py` — road conditions now mirror the filtered set like travel
+  times: a second listener adds new roads and removes ones that leave the
+  cap (registry entry first, then entity).
+- Options flow + `translations/en.json` expose the new field.

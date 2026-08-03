@@ -9,9 +9,20 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from .const import DOMAIN, SCAN_INTERVAL
-from .models import CameraData, IncidentData, ProviderData, TravelTimeData
+from .models import (
+    CameraData,
+    IncidentData,
+    ProviderData,
+    RoadConditionData,
+    TravelTimeData,
+)
 from .providers import BaseProvider
-from .selection import select_cameras, select_incidents, select_travel_times
+from .selection import (
+    select_cameras,
+    select_incidents,
+    select_road_conditions,
+    select_travel_times,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -61,3 +72,10 @@ class The511DataUpdateCoordinator(DataUpdateCoordinator[ProviderData]):
     def travel_times(self) -> list[TravelTimeData]:
         """Return the travel times the platforms should surface."""
         return select_travel_times(self.hass, self.config_entry, self.data.travel_times)
+
+    @property
+    def road_conditions(self) -> list[RoadConditionData]:
+        """Return the road conditions the platforms should surface."""
+        return select_road_conditions(
+            self.hass, self.config_entry, self.data.road_conditions
+        )

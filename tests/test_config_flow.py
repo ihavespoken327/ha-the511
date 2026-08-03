@@ -11,6 +11,7 @@ from custom_components.the511.const import (
     CONF_INCIDENT_RADIUS,
     CONF_MAX_CAMERAS,
     CONF_MAX_INCIDENTS,
+    CONF_MAX_ROAD_CONDITIONS,
     CONF_MAX_TRAVEL_TIMES,
     CONF_PROVIDER,
     CONF_SHOW_ROADWORK,
@@ -177,6 +178,7 @@ async def test_options_flow_shows_form(hass, fake_provider_class):
     assert CONF_MAX_INCIDENTS in result["data_schema"].schema
     assert CONF_INCIDENT_RADIUS in result["data_schema"].schema
     assert CONF_MAX_TRAVEL_TIMES in result["data_schema"].schema
+    assert CONF_MAX_ROAD_CONDITIONS in result["data_schema"].schema
     assert CONF_SHOW_ROADWORK in result["data_schema"].schema
 
 

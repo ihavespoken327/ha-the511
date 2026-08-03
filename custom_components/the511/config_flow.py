@@ -19,12 +19,14 @@ from .const import (
     CONF_INCIDENT_RADIUS,
     CONF_MAX_CAMERAS,
     CONF_MAX_INCIDENTS,
+    CONF_MAX_ROAD_CONDITIONS,
     CONF_MAX_TRAVEL_TIMES,
     CONF_PROVIDER,
     CONF_SHOW_ROADWORK,
     DEFAULT_INCIDENT_RADIUS,
     DEFAULT_MAX_CAMERAS,
     DEFAULT_MAX_INCIDENTS,
+    DEFAULT_MAX_ROAD_CONDITIONS,
     DEFAULT_MAX_TRAVEL_TIMES,
     DEFAULT_SHOW_ROADWORK,
     DOMAIN,
@@ -187,6 +189,12 @@ def _build_options_schema(config_entry: ConfigEntry) -> vol.Schema:
                 CONF_MAX_TRAVEL_TIMES,
                 default=options.get(CONF_MAX_TRAVEL_TIMES, DEFAULT_MAX_TRAVEL_TIMES),
             ): _count_selector("routes"),
+            vol.Required(
+                CONF_MAX_ROAD_CONDITIONS,
+                default=options.get(
+                    CONF_MAX_ROAD_CONDITIONS, DEFAULT_MAX_ROAD_CONDITIONS
+                ),
+            ): _count_selector("roads"),
             vol.Required(
                 CONF_SHOW_ROADWORK,
                 default=options.get(CONF_SHOW_ROADWORK, DEFAULT_SHOW_ROADWORK),

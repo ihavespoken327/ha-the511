@@ -80,3 +80,17 @@ async def test_travel_time_entity(hass, fake_provider_class):
     assert state.attributes["delay"] == 2.0
     assert state.attributes["distance"] == 4.0
     assert state.attributes["region"] == "Dane"
+
+
+async def test_road_condition_leaving_cap_is_removed(hass, fake_provider_class):
+    """A road condition that leaves the selection should be removed entirely."""
+    entry = await _setup_entry(hass, fake_provider_class)
+    coordinator = hass.data[DOMAIN][entry.entry_id]
+
+    coordinator.data.road_conditions = []
+    coordinator.async_update_listeners()
+    await hass.async_block_till_done()
+
+    state = hass.states.get("sensor.the_511_i_94")
+    assert state is None
+    assert async_get_entity_registry(hass).async_get("sensor.the_511_i_94") is None
