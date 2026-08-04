@@ -99,6 +99,58 @@ dialog (Settings > Devices & Services > The 511 > Options):
 - When an incident, route, or road condition leaves the selection it is
   removed from the entity registry, keeping the registry clean.
 
+## Entities
+
+Each provider creates the entity types its feed supports (see the capability
+table). Sensors update every 5 minutes; cameras are snapshots fetched on
+demand.
+
+### Travel time sensor (`sensor.*`)
+
+State is the current travel time in **minutes** (numeric, device class
+*Duration*) — the DOT's measured estimate for that route segment.
+
+Attributes: `road`, `normal_minutes`, `delay`, `distance`, `region`,
+`start_latitude`, `start_longitude`, `end_latitude`, `end_longitude`.
+
+### Message sign sensor (`sensor.*`)
+
+State is the **full text currently displayed on the sign** (free text, HTML
+stripped). It can be a travel time, a weather warning, or any other message
+the DOT posts — it is never parsed into numbers.
+
+Attributes: `road`, `direction`, `latitude`, `longitude`.
+
+### Road condition sensor (`sensor.*`)
+
+State is the surface status string (e.g. `Wet`, `Snow Covered`).
+
+Attributes: `surface`, `pavement_temperature`, `air_temperature`,
+`visibility`, `wind_speed`, `snow`, `ice`.
+
+### Weather station sensor (`sensor.*`)
+
+State is the air temperature in **°C** (device class *Temperature*).
+
+Attributes: `humidity`, `dewpoint`, `wind`, `visibility`.
+
+### Incident binary sensor (`binary_sensor.*`)
+
+State is `on` while the incident is active, `off` otherwise (device class
+*Problem*). Incidents with coordinates also surface as `geo_location` markers
+on the map.
+
+Attributes: `description`, `severity`, `event_type`, `road`, `latitude`,
+`longitude`.
+
+### Traffic camera (`camera.*`)
+
+Still snapshots only — the entity fetches the latest image on demand, refreshed
+from the same feed; there is no live stream.
+
+Attributes: `road`, `direction`, `latitude`, `longitude`, `status`,
+`video_url`.
+
 ## Screenshots
 
 Coming soon — dashboard previews will be added here once the custom cards ship.
