@@ -7,7 +7,7 @@ name = "ha-the511"
 version = "0.1.0"
 description = "Traffic cameras, road conditions, incidents and more from North American 511 systems."
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.14.2"
 license = { text = "MIT" }
 
 [project.optional-dependencies]

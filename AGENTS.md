@@ -38,7 +38,7 @@ from North American 511 systems.
 
 - Work in **small, pull-request-sized increments** (one phase per PR). Each
   increment must compile, pass lint, and be testable.
-- Python version: **3.12+**. Formatting: **Black** (88 cols). Lint: **ruff**.
+- Python version: **3.14.2+**. Formatting: **Black** (88 cols). Lint: **ruff**.
   Types: **mypy --strict**. Tests: **pytest**.
 - Do not generate large amounts of code in one shot.
 

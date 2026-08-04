@@ -58,7 +58,7 @@ mypy custom_components
 pytest
 ```
 
-- Python 3.12+, Black at 88 cols, ruff, mypy --strict.
+- Python 3.14.2+, Black at 88 cols, ruff, mypy --strict.
 - Tests use `pytest-homeassistant-custom-component`, so they run against a
   real Home Assistant harness. Mock HTTP with `aioclient_mock` (see
   `tests/test_wisconsin.py`); the fake provider in `tests/conftest.py` drives
