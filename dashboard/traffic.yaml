@@ -111,7 +111,7 @@ button_card_templates:
         ]]]
 
 views:
-  - title: Traffic
+  - title: The 511
     path: traffic
     icon: mdi:traffic-light
     theme: Blackout
