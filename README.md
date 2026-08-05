@@ -172,8 +172,6 @@ Install these in HACS, then restart Home Assistant:
 
 ### Full dashboard
 
-![The 511 dashboard](dashboard/screenshots/fulldash.png)
-
 <video controls src="dashboard/screenshots/fulldash.mp4"></video>
 
 The whole dashboard on a desktop browser — road conditions and the
@@ -484,8 +482,6 @@ card_mod:
 </details>
 
 ### Traffic cameras
-
-![Traffic cameras](dashboard/screenshots/camera.png)
 
 <video controls src="dashboard/screenshots/camera.mp4"></video>
 
@@ -1172,8 +1168,6 @@ cards:
 </details>
 
 ### Message signs
-
-![Message signs](dashboard/screenshots/road_signs.png)
 
 <video controls src="dashboard/screenshots/road_signs.mp4"></video>
 
