@@ -174,7 +174,7 @@ Install these in HACS, then restart Home Assistant:
 
 ![The 511 dashboard](dashboard/screenshots/fulldash.png)
 
-<video controls src="dashboard/screenshots/fulldash.mov"></video>
+<video controls src="dashboard/screenshots/fulldash.mp4"></video>
 
 The whole dashboard on a desktop browser — road conditions and the
 status header up top, cameras, message signs, travel times, incidents and
@@ -487,7 +487,7 @@ card_mod:
 
 ![Traffic cameras](dashboard/screenshots/camera.png)
 
-<video controls src="dashboard/screenshots/camera.mov"></video>
+<video controls src="dashboard/screenshots/camera.mp4"></video>
 
 A swipeable gallery of the camera entities nearest your home, styled as
 dark picture cards that auto-advance every 8 seconds.
@@ -1175,7 +1175,7 @@ cards:
 
 ![Message signs](dashboard/screenshots/road_signs.png)
 
-<video controls src="dashboard/screenshots/road_signs.mov"></video>
+<video controls src="dashboard/screenshots/road_signs.mp4"></video>
 
 Two parts. The first is a vertically-scrolling set of monospace
 "MINUTES TO" sign cards, one per `sensor.the_511_sign_*` entity. The
