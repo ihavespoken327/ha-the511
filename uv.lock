@@ -1034,6 +1034,7 @@ dev = [
     { name = "pytest-asyncio" },
     { name = "pytest-cov" },
     { name = "pytest-homeassistant-custom-component" },
+    { name = "pyyaml" },
     { name = "ruff" },
     { name = "types-pyyaml" },
 ]
@@ -1052,6 +1053,7 @@ requires-dist = [
     { name = "pytest-asyncio", marker = "extra == 'dev'" },
     { name = "pytest-cov", marker = "extra == 'dev'" },
     { name = "pytest-homeassistant-custom-component", marker = "extra == 'dev'" },
+    { name = "pyyaml", marker = "extra == 'dev'", specifier = ">=6.0.3,<7" },
     { name = "ruff", marker = "extra == 'dev'" },
     { name = "types-pyyaml", marker = "extra == 'dev'" },
 ]
