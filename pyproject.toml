@@ -21,6 +21,7 @@ dev = [
   "pytest-homeassistant-custom-component",
   "ruff",
   "types-pyyaml",
+  "pyyaml>=6.0.3,<7",
 ]
 
 [tool.setuptools.packages.find]
