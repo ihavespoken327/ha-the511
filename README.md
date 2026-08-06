@@ -35,6 +35,14 @@ Cameras & Road Conditions
 > key; Alberta, Ontario, and the Iteris/ATG states publish openly and need no
 > key.
 
+## Contributing
+
+Want your state or province on here? Adding one is usually a ~25-line
+provider file — fork, clone, branch, write, PR. See
+[CONTRIBUTING.md](CONTRIBUTING.md) for the full walkthrough, or open an
+[issue](https://github.com/ihavespoken327/ha-the511/issues) if your state's
+511 system isn't listed and you'd like help adding it.
+
 ## Installation
 
 **HACS** (recommended):
