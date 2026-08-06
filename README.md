@@ -1,11 +1,26 @@
 # The 511
 
+[![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg?style=for-the-badge)](https://github.com/hacs/integration)
+[![Home Assistant](https://img.shields.io/badge/Home%20Assistant-2024.6-41BDF5?logo=homeassistant&logoColor=white&style=for-the-badge)](https://www.home-assistant.io/)
+[![GitHub release](https://img.shields.io/github/v/release/ihavespoken327/ha-the511?style=for-the-badge)](https://github.com/ihavespoken327/ha-the511/releases)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
+
 A Home Assistant custom integration for traffic cameras, road conditions,
 incidents, weather stations, travel times, and message signs from North
 American 511 systems.
 
 **Domain:** `the511` · **Display name:** The 511 · **Subtitle:** Traffic
 Cameras & Road Conditions
+
+## Features
+
+- **Traffic cameras** — still snapshots of DOT camera feeds, refreshed on demand
+- **Incidents** — crashes, closures, and hazards as `binary_sensor` + map markers
+- **Road conditions** — surface status per roadway (wet, snow, ice, ...)
+- **Weather stations** — air temperature, humidity, dewpoint, wind
+- **Travel times** — measured route estimates with delay
+- **Message signs** — the live text currently on dynamic message signs
+- **Multi-provider** — 20+ US states and Canadian provinces on a shared plugin base
 
 > [!WARNING]
 > Work in progress. Cameras, incidents, road conditions, weather stations,
@@ -24,9 +39,11 @@ Cameras & Road Conditions
 
 **HACS** (recommended):
 
-1. In HACS, open **⋯ → Custom repositories**.
-2. Add `https://github.com/ihavespoken327/ha-the511` with category **Integration**.
-3. Find **The 511** in HACS, click **Download**, then **Restart** Home Assistant.
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=ihavespoken327&repository=ha-the511&category=integration)
+
+1. Click the button above, or in HACS open **⋯ → Custom repositories** and add `https://github.com/ihavespoken327/ha-the511` with category **Integration**.
+2. Find **The 511** under **Integrations**, click **Download**, then **Restart** Home Assistant.
+3. Once restarted, continue to [Setup](#setup) below.
 
 **Manual:** copy the `custom_components/the511/` folder into your HA `config/custom_components/` directory and restart.
 
@@ -130,7 +147,9 @@ Attributes: `surface`, `pavement_temperature`, `air_temperature`,
 
 ### Weather station sensor (`sensor.*`)
 
-State is the air temperature in **°C** (device class *Temperature*).
+State is the air temperature (device class *Temperature*). The sensor reports
+natively in **°C** and Home Assistant converts it to your configured unit
+preference — °F on an imperial system, °C on metric.
 
 Attributes: `humidity`, `dewpoint`, `wind`, `visibility`.
 
@@ -4627,6 +4646,45 @@ pytest
 | 17 | South Carolina, Montana, and South Dakota on a new Iteris/ATG GeoJSON base | ✅ |
 | 18 | Road-condition dedupe fix (one sensor per road name) | ✅ |
 | 19 | Dynamic message sign sensors (Montana `dms` layer) | ✅ |
+
+## Troubleshooting / FAQ
+
+**The integration isn't showing up in HACS after I added the repository.**
+Make sure you added the repository with category **Integration** (not
+Frontend) and restarted Home Assistant after clicking **Download**.
+
+**I picked my state but got no entities.**
+Capabilities vary by provider — not every 511 system publishes every feed.
+Open the integration's **Options** dialog (Settings → Devices & Services →
+The 511 → Options) to confirm the data source is reachable and, for keyed
+providers, that your API key is valid. Providers you added with a bad key
+silently surface nothing; check the logs for `the511` errors.
+
+**Why do cameras only update on demand / look like stills?**
+The 511 feeds publish periodic snapshots, not video streams. Each camera
+entity is a snapshot fetched from the feed when HA requests an image.
+
+**Temperatures show in °C but I want °F.**
+The sensor reports natively in °C (device class *Temperature*); Home
+Assistant converts it to the unit configured under **Settings → System →
+General** (imperial = °F, metric = °C). No per-sensor setting needed.
+
+**A camera/incident/route disappeared from the registry.**
+Entity bounds (the Options dialog caps like *Maximum cameras*) drop entities
+that leave the selection — a closed incident or a route that fell out of the
+nearest-N window is removed to keep the registry clean. Raise the cap to keep
+more of them around.
+
+**I get a throttling/rate-limit error from the provider.**
+Polls run every 5 minutes. Some providers (e.g. Utah, 10 calls/min) are
+strictly throttled — a burst of entity updates can trip it. It recovers on
+the next poll; if it persists, check the provider portal for your key's
+quota.
+
+**Do I need a key for my state?**
+Only keyed providers (see the [developer key table](#getting-a-developer-api-key))
+need one. Alberta, Ontario, South Carolina, Montana, and South Dakota publish
+openly and skip the credential step entirely.
 
 ## License
 
