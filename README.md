@@ -235,6 +235,15 @@ state/province actually publishes; `Key` means the provider needs the 511
 system's free developer API key, `Open` means the feed is public and no key
 is required.
 
+> [!NOTE]
+> **Not every provider has been confirmed against a live feed yet.** Each one
+> is written to the vendor's documented API and covered by tests, but the
+> feeds vary by state and can change. If a provider shows no entities after
+> setup, your state may simply publish fewer feeds than the table suggests —
+> open the integration's **Options** dialog and check the logs. If it looks
+> like a genuine bug, please [open an issue](https://github.com/ihavespoken327/ha-the511/issues)
+> so it can be fixed.
+
 | Provider | Cameras | Incidents | Road conditions | Weather | Travel times | Message signs | Key |
 |----------|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
 | Wisconsin | ✅ | ✅ | ✅ | | ✅ | | Key |
