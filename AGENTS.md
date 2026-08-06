@@ -52,6 +52,18 @@ mypy custom_components
 pytest
 ```
 
+## Dependabot alerts (known, intentionally left open)
+
+GitHub flags vulnerabilities in `uv.lock` (`pillow`, `PyJWT`, `cryptography`).
+These are **dev/test-only** dependencies pulled in by
+`pytest-homeassistant-custom-component` → Home Assistant core; the integration
+ships with `requirements: []` and has no runtime deps. The pinned versions are
+fixed by Home Assistant core itself (`Pillow==12.2.0`, `PyJWT==2.12.1`,
+`cryptography==48.0.1` in 2026.7.4), and even the latest HA (2026.8.0) still
+pins the vulnerable `cryptography`. There is no repo-level fix; do not bump
+these (the only path is a beta HA pin via pytest-hacc, which also doesn't fix
+cryptography). Revisit only if a stable HA releases with newer pins.
+
 ## Phase status
 
 Phases 1–19 done (bootstrap, provider framework, Wisconsin provider, camera,

@@ -1,7 +1,9 @@
 {
   "domain": "the511",
   "name": "The 511",
-  "codeowners": ["@ihavespoken327"],
+  "codeowners": [
+    "@ihavespoken327"
+  ],
   "config_flow": true,
   "dependencies": [],
   "documentation": "https://github.com/ihavespoken327/ha-the511/blob/main/README.md",
@@ -9,5 +11,5 @@
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/ihavespoken327/ha-the511/issues",
   "requirements": [],
-  "version": "0.9.1"
+  "version": "0.9.2"
 }
