@@ -19,6 +19,8 @@ jobs:
           category: "integration"
 
   validate-hassfest:
+    permissions:
+      contents: read
     runs-on: "ubuntu-latest"
     steps:
       - name: Checkout
