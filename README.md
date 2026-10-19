@@ -49,9 +49,14 @@ provider file — fork, clone, branch, write, PR. See
 
 [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=ihavespoken327&repository=ha-the511&category=integration)
 
-1. Click the button above, or in HACS open **⋯ → Custom repositories** and add `https://github.com/ihavespoken327/ha-the511` with category **Integration**.
-2. Find **The 511** under **Integrations**, click **Download**, then **Restart** Home Assistant.
-3. Once restarted, continue to [Setup](#setup) below.
+1. Click the button above, or in HACS open **Integrations**, search for **The 511**, click **Download**, then **Restart** Home Assistant.
+2. Once restarted, continue to [Setup](#setup) below.
+
+> [!NOTE]
+> The 511 is now included in the HACS default store — no custom repository
+> step needed. If you previously added it as a custom repository, you can
+> remove that entry in HACS; it will keep working and still receive
+> updates.
 
 **Manual:** copy the `custom_components/the511/` folder into your HA `config/custom_components/` directory and restart.
 
@@ -353,8 +358,10 @@ pytest
 ## Troubleshooting / FAQ
 
 **The integration isn't showing up in HACS after I added the repository.**
-Make sure you added the repository with category **Integration** (not
-Frontend) and restarted Home Assistant after clicking **Download**.
+The 511 is in the HACS default store, so no custom repository is needed —
+just search for **The 511** under **Integrations** in HACS. If you did add
+it as a custom repository, make sure the category is **Integration** (not
+Frontend) and restart Home Assistant after clicking **Download**.
 
 **I picked my state but got no entities.**
 Capabilities vary by provider — not every 511 system publishes every feed.
