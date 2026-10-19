@@ -22,10 +22,10 @@ Cameras & Road Conditions
 - **Message signs** — the live text currently on dynamic message signs
 - **Multi-provider** — 20+ US states and Canadian provinces on a shared plugin base
 
-> [!WARNING]
-> Work in progress. Cameras, incidents, road conditions, weather stations,
-> travel times, dynamic message signs, incident map markers, multi-provider
-> support, and entity bounds are all implemented. Providers are available for
+> [!NOTE]
+> Cameras, incidents, road conditions, weather stations, travel times,
+> dynamic message signs, incident map markers, multi-provider support, and
+> entity bounds are all implemented. Providers are available for
 > Wisconsin, Louisiana, Alaska, New York, Georgia, Arizona, Connecticut,
 > Florida, Idaho, Nevada, and Utah, plus the Canadian provinces Alberta,
 > Ontario, Newfoundland & Labrador, Manitoba, New Brunswick, Saskatchewan,
