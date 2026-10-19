@@ -207,7 +207,7 @@ Install these in HACS, then restart Home Assistant:
 
 ### Full dashboard
 
-<video controls src="https://github.com/user-attachments/assets/373147c2-7203-4fab-a264-63d77372fad0"></video>
+![Full dashboard](https://raw.githubusercontent.com/ihavespoken327/ha-the511/main/dashboard/screenshots/fulldash.gif)
 
 The whole dashboard on a desktop browser — road conditions and the
 status header up top, cameras, message signs, travel times, incidents and
@@ -215,7 +215,7 @@ their map below.
 
 ### Road conditions
 
-![Road conditions card](dashboard/screenshots/road_conditions.png)
+![Road conditions card](https://raw.githubusercontent.com/ihavespoken327/ha-the511/main/dashboard/screenshots/road_conditions.png)
 
 A hazard-aware card. It scans every `sensor.the_511_*` road condition,
 counts the roads that are affected, prints the worst surface status, and
@@ -223,13 +223,13 @@ glows the card border red/amber/green to match.
 
 ### Traffic cameras
 
-<video controls src="https://github.com/user-attachments/assets/1bf3126e-b6d7-4f9a-af7e-ee8d0922c4fb"></video>
+![Traffic camera carousel](https://raw.githubusercontent.com/ihavespoken327/ha-the511/main/dashboard/screenshots/camera.gif)
 
 Camera carousel showing live snapshots from each configured camera.
 
 ### Message signs
 
-<video controls src="https://github.com/user-attachments/assets/0fdc84b4-3292-4be3-9c12-6fdf10af549e"></video>
+![Dynamic message signs](https://raw.githubusercontent.com/ihavespoken327/ha-the511/main/dashboard/screenshots/road_signs.gif)
 
 Dynamic message-sign cards; tapping a sign opens the full text in a pop-up.
 
