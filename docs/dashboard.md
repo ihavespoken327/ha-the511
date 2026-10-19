@@ -31,7 +31,7 @@ their map below.
 
 ## Road conditions
 
-![Road conditions card](dashboard/screenshots/road_conditions.png)
+![Road conditions card](https://raw.githubusercontent.com/ihavespoken327/ha-the511/main/dashboard/screenshots/road_conditions.png)
 
 A hazard-aware card. It scans every `sensor.the_511_*` road condition,
 counts the roads that are affected, prints the worst surface status, and
@@ -184,7 +184,7 @@ custom_fields:
 
 ## Active incidents
 
-![Active incidents card](dashboard/screenshots/active_incidents.png)
+![Active incidents card](https://raw.githubusercontent.com/ihavespoken327/ha-the511/main/dashboard/screenshots/active_incidents.png)
 
 A markdown card that lists every active incident binary sensor
 (`binary_sensor.the_511_*`), reformatting the names into a readable
@@ -287,7 +287,7 @@ card_mod:
 
 ## Incidents map
 
-![Incidents map](dashboard/screenshots/map.png)
+![Incidents map](https://raw.githubusercontent.com/ihavespoken327/ha-the511/main/dashboard/screenshots/map.png)
 
 A dark-themed `map` card showing the incident `geo_location` markers
 the integration publishes, with an amber accent and a dark tile filter.
@@ -4260,7 +4260,7 @@ popup_style: classic
 
 ## Travel times
 
-![Travel times card](dashboard/screenshots/travel_times.png)
+![Travel times card](https://raw.githubusercontent.com/ihavespoken327/ha-the511/main/dashboard/screenshots/travel_times.png)
 
 A travel-time card for the configured routes: each row shows the route
 name, a delay status line (green/amber/red), and the rounded minutes to
