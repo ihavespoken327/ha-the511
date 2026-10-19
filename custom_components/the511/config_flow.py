@@ -3,9 +3,18 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-import voluptuous as vol
+if TYPE_CHECKING:
+    from probatio import Required, Schema
+else:
+    try:
+        # Home Assistant 2026.9+ builds flow schemas with probatio.
+        from probatio import Required, Schema
+    except ImportError:
+        # Older Home Assistant releases still use voluptuous.
+        from voluptuous import Required, Schema
+
 from homeassistant.config_entries import (
     ConfigEntry,
     ConfigFlow,
@@ -125,7 +134,7 @@ class The511OptionsFlowHandler(OptionsFlow):
         )
 
 
-def _build_schema(provider_classes: tuple[type[BaseProvider], ...]) -> vol.Schema:
+def _build_schema(provider_classes: tuple[type[BaseProvider], ...]) -> Schema:
     """Build the user step schema from the registered provider classes."""
     options = [
         selector.SelectOptionDict(
@@ -134,10 +143,10 @@ def _build_schema(provider_classes: tuple[type[BaseProvider], ...]) -> vol.Schem
         )
         for provider in provider_classes
     ]
-    return vol.Schema(
+    return Schema(
         {
-            vol.Required(CONF_NAME, default=NAME): str,
-            vol.Required(CONF_PROVIDER): selector.SelectSelector(
+            Required(CONF_NAME, default=NAME): str,
+            Required(CONF_PROVIDER): selector.SelectSelector(
                 selector.SelectSelectorConfig(
                     options=options,
                     mode=selector.SelectSelectorMode.LIST,
@@ -147,35 +156,35 @@ def _build_schema(provider_classes: tuple[type[BaseProvider], ...]) -> vol.Schem
     )
 
 
-def _build_credentials_schema(provider_class: type[BaseProvider]) -> vol.Schema:
+def _build_credentials_schema(provider_class: type[BaseProvider]) -> Schema:
     """Build a schema collecting the provider's required config keys."""
     fields: dict[Any, Any] = {}
     for key in provider_class.required_config_keys:
         if key in provider_class.secret_config_keys:
-            fields[vol.Required(key)] = selector.TextSelector(
+            fields[Required(key)] = selector.TextSelector(
                 selector.TextSelectorConfig(
                     type=selector.TextSelectorType.PASSWORD,
                 )
             )
         else:
-            fields[vol.Required(key)] = str
-    return vol.Schema(fields)
+            fields[Required(key)] = str
+    return Schema(fields)
 
 
-def _build_options_schema(config_entry: ConfigEntry) -> vol.Schema:
+def _build_options_schema(config_entry: ConfigEntry) -> Schema:
     """Build the options schema prefilled from the entry's current options."""
     options = config_entry.options
-    return vol.Schema(
+    return Schema(
         {
-            vol.Required(
+            Required(
                 CONF_MAX_CAMERAS,
                 default=options.get(CONF_MAX_CAMERAS, DEFAULT_MAX_CAMERAS),
             ): _count_selector("cameras"),
-            vol.Required(
+            Required(
                 CONF_MAX_INCIDENTS,
                 default=options.get(CONF_MAX_INCIDENTS, DEFAULT_MAX_INCIDENTS),
             ): _count_selector("incidents"),
-            vol.Required(
+            Required(
                 CONF_INCIDENT_RADIUS,
                 default=options.get(CONF_INCIDENT_RADIUS, DEFAULT_INCIDENT_RADIUS),
             ): selector.NumberSelector(
@@ -187,21 +196,21 @@ def _build_options_schema(config_entry: ConfigEntry) -> vol.Schema:
                     unit_of_measurement="miles",
                 )
             ),
-            vol.Required(
+            Required(
                 CONF_MAX_TRAVEL_TIMES,
                 default=options.get(CONF_MAX_TRAVEL_TIMES, DEFAULT_MAX_TRAVEL_TIMES),
             ): _count_selector("routes"),
-            vol.Required(
+            Required(
                 CONF_MAX_ROAD_CONDITIONS,
                 default=options.get(
                     CONF_MAX_ROAD_CONDITIONS, DEFAULT_MAX_ROAD_CONDITIONS
                 ),
             ): _count_selector("roads"),
-            vol.Required(
+            Required(
                 CONF_MAX_MESSAGE_SIGNS,
                 default=options.get(CONF_MAX_MESSAGE_SIGNS, DEFAULT_MAX_MESSAGE_SIGNS),
             ): _count_selector("signs"),
-            vol.Required(
+            Required(
                 CONF_SHOW_ROADWORK,
                 default=options.get(CONF_SHOW_ROADWORK, DEFAULT_SHOW_ROADWORK),
             ): selector.BooleanSelector(),
