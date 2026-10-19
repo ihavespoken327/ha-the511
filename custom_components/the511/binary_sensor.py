@@ -4,10 +4,16 @@ from __future__ import annotations
 
 from typing import Any
 
-from homeassistant.components.binary_sensor import (
-    BinarySensorDeviceClass,
-    BinarySensorEntity,
-)
+from homeassistant.components.binary_sensor import BinarySensorEntity
+
+try:
+    # Home Assistant 2026.10+ defines device classes in the const submodule.
+    from homeassistant.components.binary_sensor.const import BinarySensorDeviceClass
+except ImportError:
+    # Older Home Assistant releases re-export it from the component root.
+    from homeassistant.components.binary_sensor import (  # type: ignore[attr-defined]
+        BinarySensorDeviceClass,
+    )
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
